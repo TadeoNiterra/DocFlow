@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Filament\Resources\Users\Schemas;
+
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
+use Filament\Support\Enums\Operation;
+
+class UserForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                TextInput::make('name')
+                    ->required(),
+                TextInput::make('email')
+                    ->label('Email address')
+                    ->email()
+                    ->required(),
+                DateTimePicker::make('email_verified_at'),
+                TextInput::make('password')
+                    ->password()
+                    ->required()
+                    ->hiddenOn(Operation::Edit),
+                Select::make('role')
+                    ->label('Rol del Usuario')
+                    ->options([
+                        'Usuario' => 'Usuario',
+                        'Administrador' => 'Administrador',
+                    ])
+                    ->required(),
+                TextInput::make('is_active')
+                    ->required()
+                    ->default('Activo'),
+                Select::make('default_raci_type')
+                    ->label('Nivel de RACI')
+                    ->options([
+                        'R' => 'Responsable',
+                        'A' => 'Aprobador',
+                        'C' => 'Consultado',
+                        'I' => 'Informado',
+                    ])
+                    ->required()
+            ]);
+    }
+}
