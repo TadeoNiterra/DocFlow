@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Documents\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Actions\EditAction;
+use Filament\Tables\Grouping\Group; 
 
 class DocumentsTable
 {
@@ -25,12 +26,18 @@ class DocumentsTable
                 TextColumn::make('type')
                     ->label('Tipo')
                     ->badge()
-                    ->color('info')
+                    ->color(fn(string $state): string => match ($state) {
+                        'Politica' => 'danger',      
+                        'Procedimiento' => 'warning', 
+                        'Formato' => 'success',      
+                        'Manual' => 'info',          
+                        default => 'gray',
+                    })
                     ->sortable(),
 
                 TextColumn::make('versions_count')
                     ->label('Total Revisiones')
-                    ->counts('versions') // Cuenta automáticamente cuántas versiones tiene en la BD
+                    ->counts('versions') 
                     ->alignCenter(),
 
                 TextColumn::make('updated_at')
@@ -41,6 +48,13 @@ class DocumentsTable
             ->actions([
                 EditAction::make()
                     ->label('Editar'),
-            ]);
+            ])
+            
+            ->groups([
+                Group::make('type')
+                    ->label('Tipo de Documento')
+                    ->collapsible(), 
+            ])
+            ->defaultGroup('type'); 
     }
 }

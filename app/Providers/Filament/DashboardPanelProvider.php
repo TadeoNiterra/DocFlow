@@ -18,6 +18,8 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\DocumentTypeChart;
 
 class DashboardPanelProvider extends PanelProvider
 {
@@ -31,16 +33,14 @@ class DashboardPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Green,
             ])
+            ->sidebarCollapsibleOnDesktop()
+
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
+            
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -51,6 +51,10 @@ class DashboardPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+            ])
+            ->widgets([
+                StatsOverview::class,      // Tarjetas de KPI superiores
+                DocumentTypeChart::class,  // Gráfico analítico de dona
             ])
             ->authMiddleware([
                 Authenticate::class,

@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class DocumentVersionResource extends Resource
 {
@@ -53,5 +54,24 @@ class DocumentVersionResource extends Resource
             'create' => CreateDocumentVersion::route('/create'),
             'edit' => EditDocumentVersion::route('/{record}/edit'),
         ];
+    }
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if ($user && $user->default_raci_type === 'I') {
+            return $query->where('status', 'aprobado');
+        }
+
+        if ($user && $user->default_raci_type === 'A') {
+            return $query->where('status', 'revisado');
+        }
+
+        if ($user && $user->default_raci_type === 'C') {
+            return $query->where('status', 'terminado');
+        }
+
+        return $query;
     }
 }

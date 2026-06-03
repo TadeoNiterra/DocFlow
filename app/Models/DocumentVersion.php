@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['document_id', 'version_number', 'change_description', 'file_path', 'file_name', 'status', 'user_id'])] // <-- Agregado 'status'
 class DocumentVersion extends Model
@@ -20,5 +21,10 @@ class DocumentVersion extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    
+    public function signatures(): HasMany
+    {
+        return $this->hasMany(DocumentSignature::class);
     }
 }
