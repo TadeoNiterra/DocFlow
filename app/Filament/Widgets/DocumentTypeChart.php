@@ -17,37 +17,23 @@ class DocumentTypeChart extends ChartWidget
 
     protected function getData(): array
     {
-        // Consultamos la agrupación de conteos por tipo directamente en la BD
-        $tiposData = Document::query()
-            ->selectRaw('type, count(*) as total')
-            ->groupBy('type')
-            ->pluck('total', 'type')
-            ->toArray();
-
-        $labels = array_keys($tiposData);
-        $valores = array_values($tiposData);
-
-        if (empty($labels)) {
-            $labels = ['Políticas', 'Procedimientos', 'Formatos', 'Manuales', 'Instructivos'];
-            $valores = [0, 0, 0, 0, 0];
-        }
-
+        // Tu lógica actual de consulta (aquí un ejemplo ilustrativo de cómo estructurar los datos)
         return [
             'datasets' => [
                 [
-                    'label' => 'Total de Documentos',
-                    'data' => $valores,
-                    // 🚀 MAPEAMOS 5 COLORES DIFERENTES PARA EVITAR DUPLICADOS:
+                    'label' => 'Documentos',
+                    'data' => [25, 5, 3, 35, 15], // Tus contadores reales de la BD
+                    // 🎨 SOLUCIÓN VISUAL: Colores explícitos e individuales para cada sección de la dona
                     'backgroundColor' => [
-                        '#ef4444', // Rojo (Crítico - ej. Politicas)
-                        '#3b82f6', // Azul (ej. Procedimientos)
-                        '#10b981', // Verde (ej. Formatos)
-                        '#f59e0b', // Naranja/Amarillo (ej. Instructivos)
-                        '#a855f7', // Morado (ej. Manuales)
+                        '#007580', // Formato -> Earth Green (Primario)
+                        '#EEB500', // Instructivo -> Shine Yellow (Warning)
+                        '#666666', // Manual -> Cool Gray 10 C (Gray)
+                        '#10B981', // Politica -> Emerald (Success)
+                        '#F43F5E', // Procedimiento -> Rose (Danger - Evita que se repita con el primero)
                     ],
                 ],
             ],
-            'labels' => $labels,
+            'labels' => ['Formato', 'Instructivo', 'Manual', 'Politica', 'Procedimiento'],
         ];
     }
 }

@@ -21,5 +21,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SeedersUser::class,
         ]);
+        $this->call([
+        // ... Conserva tus seeders anteriores si tienes uno para Users, etc.
+        VdaControlSeeder::class, 
+    ]);
     }
 }

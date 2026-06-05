@@ -37,6 +37,21 @@ Route::get('/documentos/{version}/view-pdf', function (DocumentVersion $version)
     ]);
 })->name('documentos.ver-pdf')->middleware(['web', 'auth']);
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get(
+    '/vda/evidence/{evidence}/file',
+    function (App\Models\VdaEvidence $evidence) {
+
+        abort_unless(
+            auth()->check(),
+            403
+        );
+
+        return Storage::disk('local')
+            ->response(
+                $evidence->file_path
+            );
+    }
+)
+    ->name('vda.evidence.file');
+
+Route::redirect('/', '/dashboard');

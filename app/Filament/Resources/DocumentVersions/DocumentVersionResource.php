@@ -60,18 +60,32 @@ class DocumentVersionResource extends Resource
         $query = parent::getEloquentQuery();
         $user = auth()->user();
 
-        if ($user && $user->default_raci_type === 'I') {
+        // Si no hay ningún usuario logueado por seguridad solo devolvemos los aprobados
+        if (!$user) {
             return $query->where('status', 'aprobado');
         }
 
-        if ($user && $user->default_raci_type === 'A') {
-            return $query->where('status', 'revisado');
+        // [ R ] RESPONSABLE: Les aparece draft, terminado, revisado y aprobado (Es decir, todos)
+        if ($user->default_raci_type === 'R') {
+            return $query->whereIn('status', ['draft', 'terminado', 'revisado', 'aprobado']);
         }
 
-        if ($user && $user->default_raci_type === 'C') {
-            return $query->where('status', 'terminado');
+        // [ A ] AUTORIDAD (CISO): Les aparece revisado y aprobado
+        if ($user->default_raci_type === 'A') {
+            return $query->whereIn('status', ['revisado', 'aprobado']);
         }
 
+        // [ C ] CONSULTADO (Auditor): Les aparece terminado y aprobado
+        if ($user->default_raci_type === 'C') {
+            return $query->whereIn('status', ['terminado', 'aprobado']);
+        }
+
+        // [ I ] INFORMADO: Les aparece únicamente aprobado
+        if ($user->default_raci_type === 'I') {
+            return $query->where('status', 'aprobado');
+        }
+
+        // Fallback de seguridad por si existe otro rol no contemplado
         return $query;
     }
 }

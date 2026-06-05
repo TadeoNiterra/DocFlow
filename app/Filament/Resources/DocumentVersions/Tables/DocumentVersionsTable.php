@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\DocumentVersions\Tables;
 
-
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -18,7 +18,6 @@ use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Storage;
 use PhpParser\Node\Stmt\Label;
 
-
 use Filament\Tables\Filters\SelectFilter;
 use App\Models\Document;
 
@@ -27,6 +26,7 @@ class DocumentVersionsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->paginated(false)
             ->columns([
                 TextColumn::make('document.name')
                     ->label('Documento Maestro')
@@ -71,12 +71,31 @@ class DocumentVersionsTable
                     ->searchable()
                     ->preload()
                     ->options(function () {
-
                         return Document::query()
                             ->pluck('name', 'id')
                             ->toArray();
                     }),
             ])
+            ->groups([
+                // Agrupación 1: Por el Estado de la revisión (Mapeo por registro corregido)
+                Group::make('status')
+                    ->label('Tipo de Estatus')
+                    ->collapsible()
+                    ->getTitleFromRecordUsing(fn($record): string => match ($record->status) {
+                        'draft' => '📝 Borrador (Draft)',
+                        'terminado' => '🔍 En revisión por Auditor (Terminado)',
+                        'revisado' => '🟣 Aceptado por Auditor (Revisado)',
+                        'aprobado' => '🔒 Firmado y Publicado (Aprobado)',
+                        default => ucfirst($record->status),
+                    }),
+
+                // Agrupación 2: Por el Nombre del Documento Maestro
+                Group::make('document.name')
+                    ->label('Nombre de documento')
+                    ->collapsible()
+            ])
+            ->collapsedGroupsByDefault()
+
             ->actions([
                 ViewAction::make()
                     ->label('Ver Detalles')
@@ -84,7 +103,6 @@ class DocumentVersionsTable
                     ->infolist(function ($infolist) {
                         return $infolist
                             ->schema([
-
                                 Section::make('Historial y Registro de Cambios')
                                     ->schema([
                                         TextEntry::make('document.name')->label('Documento Maestro'),
@@ -111,7 +129,6 @@ class DocumentVersionsTable
                                             ->columnSpanFull()
                                             ->html(),
                                     ])->columns(2),
-
 
                                 Section::make('Evidencia de Firma Electrónica Inmutable')
                                     ->description('Certificado digital emitido internamente bajo cumplimiento normativo de seguridad.')
@@ -156,8 +173,6 @@ class DocumentVersionsTable
                             ]);
                     })
                     ->extraModalActions([
-
-
                         Action::make('view_pdf')
                             ->label('Ver PDF / Archivo')
                             ->icon(Heroicon::OutlinedEye)
@@ -166,14 +181,11 @@ class DocumentVersionsTable
                             ->openUrlInNewTab()
                             ->visible(function ($record) {
                                 $user = auth()->user();
-
                                 if ($user->default_raci_type === 'I') {
                                     return $record->status === 'aprobado';
                                 }
-
                                 return !empty($record->file_path);
                             }),
-
 
                         Action::make('change_version_status')
                             ->label('Avanzar Estado / Firmar')
@@ -212,7 +224,6 @@ class DocumentVersionsTable
                             })
                             ->visible(function ($record) {
                                 $user = auth()->user();
-
                                 if ($user->default_raci_type === 'I')
                                     return false;
                                 if ($user->default_raci_type === 'R' && $record->status === 'draft')
@@ -221,14 +232,12 @@ class DocumentVersionsTable
                                     return true;
                                 if ($user->default_raci_type === 'A' && $record->status === 'revisado')
                                     return true;
-
                                 return false;
                             })
                             ->action(function (array $data, $record): void {
                                 $user = auth()->user();
 
                                 if ($user->default_raci_type === 'A' && $record->status === 'revisado') {
-
                                     $cadenaParaHash = $record->id . '|' . $record->file_path . '|' . $user->email . '|' . now()->toIso8601String();
                                     $signatureHash = hash('sha256', $cadenaParaHash);
 
@@ -249,11 +258,9 @@ class DocumentVersionsTable
                                         ->body('La revisión ha sido aprobada con éxito bajo la norma TISAX.')
                                         ->success()
                                         ->send();
-
                                 } else {
                                     if (isset($data['status'])) {
                                         $record->update(['status' => $data['status']]);
-
                                         \Filament\Notifications\Notification::make()
                                             ->title('Flujo Avanzado Exitosamente')
                                             ->body("El documento cambió al estado: " . strtoupper($data['status']))
@@ -269,6 +276,108 @@ class DocumentVersionsTable
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    // 🚀 ACCIÓN UNIFICADA: Procesamiento y Avance Masivo para R, C y A
+                    BulkAction::make('mass_advance_flow')
+                        ->label(function () {
+                            $user = auth()->user();
+                            if (!$user)
+                                return 'Procesamiento Masivo';
+                            return match ($user->default_raci_type) {
+                                'R' => 'Enviar Seleccionados a Revisión',
+                                'C' => 'Aceptar y Enviar Lote a CISO',
+                                'A' => 'Aprobación y Firma Masiva TISAX',
+                                default => 'Procesamiento Masivo',
+                            };
+                        })
+                        ->icon(function () {
+                            $user = auth()->user();
+                            return $user && $user->default_raci_type === 'A' ? 'heroicon-o-shield-check' : 'heroicon-o-arrow-path';
+                        })
+                        ->color(fn() => auth()->user()?->default_raci_type === 'A' ? 'success' : 'warning')
+
+                        // Ocultar la acción por completo si el usuario es Informado (I)
+                        ->visible(fn() => auth()->user()?->default_raci_type !== 'I')
+
+                        // El formulario de contraseña solo se despliega si el usuario logueado es el CISO (A)
+                        ->form(function () {
+                            $user = auth()->user();
+                            if ($user && $user->default_raci_type === 'A') {
+                                return [
+                                    \Filament\Forms\Components\Placeholder::make('info_masiva')
+                                        ->label('🔒 Proceso de Firma Electrónica Masiva')
+                                        ->content('Al confirmar, estamparás tu firma digital inmutable en TODAS las versiones seleccionadas en estado "Revisado".'),
+
+                                    \Filament\Forms\Components\TextInput::make('password_confirmation')
+                                        ->label('Confirma tu Contraseña Institucional')
+                                        ->password()
+                                        ->required()
+                                        ->rules(['current_password']),
+                                ];
+                            }
+                            return []; // Sin campos requeridos para R y C (Ejecución directa)
+                        })
+
+                        ->action(function (\Illuminate\Database\Eloquent\Collection $records): void {
+                            $user = auth()->user();
+                            if (!$user)
+                                return;
+
+                            $contadorProcesados = 0;
+
+                            foreach ($records as $record) {
+                                // [ R ] RESPONSABLE: De 'draft' a 'terminado'
+                                if ($user->default_raci_type === 'R' && $record->status === 'draft') {
+                                    $record->update(['status' => 'terminado']);
+                                    $contadorProcesados++;
+                                }
+                                // [ C ] CONSULTADO: De 'terminado' a 'revisado'
+                                elseif ($user->default_raci_type === 'C' && $record->status === 'terminado') {
+                                    $record->update(['status' => 'revisado']);
+                                    $contadorProcesados++;
+                                }
+                                // [ A ] AUTORIDAD (CISO): De 'revisado' a 'aprobado' + Estampado de Firma
+                                elseif ($user->default_raci_type === 'A' && $record->status === 'revisado') {
+                                    $cadenaParaHash = $record->id . '|' . $record->file_path . '|' . $user->email . '|' . now()->toIso8601String();
+                                    $signatureHash = hash('sha256', $cadenaParaHash);
+
+                                    $record->signatures()->create([
+                                        'user_id' => $user->id,
+                                        'user_name_snapshot' => $user->name,
+                                        'user_email_snapshot' => $user->email,
+                                        'ip_address' => request()->ip(),
+                                        'user_agent' => request()->userAgent(),
+                                        'signature_hash' => $signatureHash,
+                                        'signed_at' => now(),
+                                    ]);
+
+                                    $record->update(['status' => 'aprobado']);
+                                    $contadorProcesados++;
+                                }
+                            }
+
+                            // Mensajes personalizados de éxito basados en el rol operativo
+                            if ($contadorProcesados > 0) {
+                                $mensaje = match ($user->default_raci_type) {
+                                    'R' => "Se enviaron {$contadorProcesados} revisiones a revisión exitosamente.",
+                                    'C' => "Se validaron y enviaron {$contadorProcesados} documentos al CISO.",
+                                    'A' => "Se firmaron digitalmente y publicaron {$contadorProcesados} documentos bajo norma TISAX.",
+                                    default => "Se actualizaron {$contadorProcesados} registros.",
+                                };
+
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Procesamiento por Lote Exitoso')
+                                    ->body($mensaje)
+                                    ->success()
+                                    ->send();
+                            } else {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Sin cambios realizados')
+                                    ->body('Ninguno de los documentos seleccionados correspondía a tu fase o estado actual del flujo.')
+                                    ->warning()
+                                    ->send();
+                            }
+                        }),
+
                     DeleteBulkAction::make(),
                 ]),
             ]);

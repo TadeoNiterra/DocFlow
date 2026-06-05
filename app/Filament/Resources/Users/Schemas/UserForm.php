@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Users\Schemas;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Operation;
 
@@ -32,9 +33,9 @@ class UserForm
                         'Administrador' => 'Administrador',
                     ])
                     ->required(),
-                TextInput::make('is_active')
-                    ->required()
-                    ->default('Activo'),
+                Toggle::make('is_active')
+                    ->label('Estado activo')
+                    ->default(true), // Valor por defecto
                 Select::make('default_raci_type')
                     ->label('Nivel de RACI')
                     ->options([
