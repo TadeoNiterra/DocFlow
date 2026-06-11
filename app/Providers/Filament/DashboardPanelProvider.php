@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\DocumentStatusChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -73,6 +74,7 @@ class DashboardPanelProvider extends PanelProvider
             ->widgets([
                 StatsOverview::class,
                 DocumentTypeChart::class,
+                DocumentStatusChart::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

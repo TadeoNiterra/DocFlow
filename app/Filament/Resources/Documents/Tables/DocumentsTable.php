@@ -12,6 +12,9 @@ class DocumentsTable
     public static function configure(Table $table): Table
     {
         return $table
+            // ⚡ OPTIMIZACIÓN SQLITE: Carga el documento junto a su última versión en una sola consulta
+            ->modifyQueryUsing(fn($query) => $query->with(['latestVersion']))
+
             ->paginated(false)
             ->columns([
                 TextColumn::make('code')
@@ -23,6 +26,19 @@ class DocumentsTable
                     ->label('Nombre del Documento')
                     ->searchable()
                     ->sortable(),
+
+                // 🚀 ÚLTIMA VERSIÓN VINCULADA DESDE EL MODELO
+                TextColumn::make('latestVersion.version_number')
+                    ->label('Última Versión')
+                    ->formatStateUsing(
+                        fn($state) =>
+                        $state
+                        ? "{$state}"
+                        : 'Sin Versión'
+                    )
+                    ->badge()
+                    ->color('warning')
+                    ->alignCenter(),
 
                 TextColumn::make('type')
                     ->label('Tipo')
@@ -37,21 +53,6 @@ class DocumentsTable
                     })
                     ->sortable(),
 
-                TextColumn::make('document.id') // Apunta a la relación
-                    ->label('Última Versión')
-                    ->getStateUsing(function ($record): ?string {
-                        // Si la fila actual tiene un documento relacionado válido
-                        if ($record->document) {
-                            // Entra al documento, busca sus versiones y extrae el último número de versión creado
-                            return $record->document->versions()->latest('id')->value('version_number');
-                        }
-
-                        return 'N/A';
-                    })
-                    ->badge()
-                    ->color('warning')
-                    ->alignCenter(),
-
                 TextColumn::make('updated_at')
                     ->label('Última Modificación')
                     ->dateTime('d/m/Y H:i')
@@ -61,7 +62,6 @@ class DocumentsTable
                 EditAction::make()
                     ->label('Editar'),
             ])
-
             ->groups([
                 Group::make('type')
                     ->label('Tipo de Documento')

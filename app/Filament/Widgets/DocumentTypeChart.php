@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\Document;
 use Filament\Widgets\ChartWidget;
+use Filament\Support\RawExpression;
 
 // 🚀 CORRECCIÓN: Asegurar que el nombre aquí sea DocumentTypeChart
 class DocumentTypeChart extends ChartWidget
@@ -17,12 +18,23 @@ class DocumentTypeChart extends ChartWidget
 
     protected function getData(): array
     {
+        $formato = Document::where('type', 'Formato')->count();
+        $instructivo = Document::where('type', 'Instructivo')->count();
+        $manual = Document::where('type', 'Manual')->count();
+        $politica = Document::where('type', 'Politica')->count();
+        $procedimiento = Document::where('type', 'Procedimiento')->count();
         // Tu lógica actual de consulta (aquí un ejemplo ilustrativo de cómo estructurar los datos)
         return [
             'datasets' => [
                 [
                     'label' => 'Documentos',
-                    'data' => [25, 5, 3, 35, 15], // Tus contadores reales de la BD
+                    'data' => [
+                        $formato,
+                        $instructivo,
+                        $manual,
+                        $politica,
+                        $procedimiento
+                    ], // Tus contadores reales de la BD
                     // 🎨 SOLUCIÓN VISUAL: Colores explícitos e individuales para cada sección de la dona
                     'backgroundColor' => [
                         '#007580', // Formato -> Earth Green (Primario)

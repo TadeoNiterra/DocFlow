@@ -23,6 +23,7 @@ class User extends Seeder
             'email' => 'jesus.marron@niterragroup.com',
             'password' => $password,
             'role' => 'admin',
+            'default_raci_type' => 'R',
             'is_active' => true,
         ]);
 
@@ -30,6 +31,7 @@ class User extends Seeder
             'name' => 'Jorge Guzman',
             'email' => 'jorge.guzman@niterragroup.com',
             'password' => $password,
+            'default_raci_type' => 'R',
             'is_active' => true,
         ]);
 
@@ -37,6 +39,7 @@ class User extends Seeder
             'name' => 'Jose Tadeo',
             'email' => 'jose.tadeo@niterragroup.com',
             'password' => $password,
+            'default_raci_type' => 'C',
             'role' => 'admin',
             'is_active' => true,
         ]);
@@ -45,6 +48,16 @@ class User extends Seeder
             'name' => 'Takahiro Arakawa',
             'email' => 'takahiro.arakawa@niterragroup.com',
             'password' => $password,
+            'default_raci_type' => 'A',
+            'is_active' => true,
+        ]);
+
+        $auditorTI = Users::create([
+            'name' => 'Jose Tadeo',
+            'email' => 'jose.tadeo@niterragroup.com',
+            'password' => $password,
+            'default_raci_type' => 'C',
+            'role' => 'admin',
             'is_active' => true,
         ]);
 
@@ -113,13 +126,6 @@ class User extends Seeder
             ['code' => 'PO-IT-05', 'name' => 'Desarrollo de funciones y aplicaciones', 'type' => 'Procedimiento'],
             ['code' => 'PO-IT-06', 'name' => 'Procedimiento de Respaldos y Copias de Seguridad', 'type' => 'Procedimiento'],
             ['code' => 'PO-IT-07', 'name' => 'Procedimiento de Gestion de Dispositivos de Almacenamiento Extraibles', 'type' => 'Procedimiento'],
-
-            // Registros que cumplen el criterio
-            ['code' => 'F-IT-11-DB', 'name' => 'Reporte de prueba de continuidad DB', 'type' => 'Formato'],
-            ['code' => 'F-IT-11-IE', 'name' => 'Reporte de prueba de continuidad IE', 'type' => 'Formato'],
-            ['code' => 'F-SGI-05', 'name' => 'Plan de auditoría interna', 'type' => 'Formato'],
-            ['code' => 'F-SGI-07', 'name' => 'Informe de auditoría (auditoria interna TISAX)', 'type' => 'Formato'],
-            ['code' => 'F-SGI-13', 'name' => 'Solicitud de Accion para Tratar Riesgos', 'type' => 'Formato'],
         ];
 
         // --- Inserción Automática en la Base de Datos ---
