@@ -39,6 +39,8 @@ class DashboardPanelProvider extends PanelProvider
             ->path('dashboard')
             ->login()
 
+            ->databaseNotifications()
+
             // Favicon Corporativo
             ->favicon(asset('favicon.png'))
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\DocumentVersions\Tables;
 
+use App\Models\DocumentVersion;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Infolists\Components\TextEntry;
@@ -59,9 +60,30 @@ class DocumentVersionsTable
                 TextColumn::make('user.name')
                     ->label('Subido por'),
 
-                TextColumn::make('created_at')
-                    ->label('Fecha de Carga')
+                TextColumn::make('creator.name')
+                    ->label('Creado por')
+                    ->placeholder('Sin asignar')
+                    ->searchable(),
+
+                TextColumn::make('reviewer.name')
+                    ->label('Revisado por')
+                    ->placeholder('Pendiente de revisión')
+                    ->searchable(),
+
+                TextColumn::make('reviewed_at')
+                    ->label('Fecha de Revisión')
                     ->dateTime('d/m/Y H:i')
+                    ->toggleable(isToggledHiddenByDefault: true), // Oculta por defecto para no saturar, se puede activar en la UI
+
+                TextColumn::make('last_reviewed_at')
+                    ->label('Última Revisión')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
+
+                TextColumn::make('approved_at')
+                    ->label('Fecha de Aprobación')
+                    ->dateTime('d/m/Y H:i')
+                    ->description(fn($record) => $record->approved_at ? '🔒 Validación TISAX' : null)
                     ->sortable(),
             ])
 
@@ -125,7 +147,7 @@ class DocumentVersionsTable
                                         TextEntry::make('created_at')->label('Fecha y Hora de Carga')->dateTime('d/m/Y H:i'),
 
                                         TextEntry::make('change_description')
-                                            ->label('Descripción de los Cambios')
+                                            ->label('Descripción de los Cambios / Historial de Rechazos')
                                             ->columnSpanFull()
                                             ->html(),
                                     ])->columns(2),
@@ -169,13 +191,15 @@ class DocumentVersionsTable
                                             ->state(fn($record): ?string => $record->signatures->first()?->user_agent),
                                     ])
                                     ->columns(2)
-                                    ->visible(fn($record): bool => $record->status === 'aprobado'),
+                                    ->visible(function (?DocumentVersion $record): bool {
+                                        return $record !== null && $record->status === 'aprobado';
+                                    }),
                             ]);
                     })
                     ->extraModalActions([
                         Action::make('view_pdf')
                             ->label('Ver PDF / Archivo')
-                            ->icon(Heroicon::OutlinedEye)
+                            ->icon('heroicon-o-eye')
                             ->color('success')
                             ->url(fn($record): string => $record->file_path ? route('documentos.ver-pdf', ['version' => $record->id]) : '#')
                             ->openUrlInNewTab()
@@ -187,39 +211,78 @@ class DocumentVersionsTable
                                 return !empty($record->file_path);
                             }),
 
+                        // 🚀 ACCIÓN ACTUALIZADA: AVANZAR ESTADO, FIRMAR O RETORNAR A DRAFT CON COMENTARIOS
                         Action::make('change_version_status')
                             ->label('Avanzar Estado / Firmar')
-                            ->icon(Heroicon::OutlinedArrowPath)
+                            ->icon('heroicon-o-arrow-path')
                             ->color('warning')
                             ->form(function ($record) {
                                 $user = auth()->user();
                                 $options = [];
 
+                                // 1. Opciones para el CISO (Aprobador 'A')
                                 if ($user->default_raci_type === 'A' && $record->status === 'revisado') {
                                     return [
                                         \Filament\Forms\Components\Placeholder::make('info_firma')
                                             ->label('🔒 Proceso de Firma Digital TISAX')
                                             ->content('Al aprobar este documento, se estampará tu firma electrónica inmutable con tu cuenta, dirección IP y fecha actual.'),
 
+                                        \Filament\Forms\Components\Select::make('status')
+                                            ->label('Acción de Aprobación')
+                                            ->options([
+                                                'aprobado' => '🖋️ Autorizar, Firmar y Publicar (Aprobado)',
+                                                'draft' => '❌ Rechazar y Devolver a borrador (Draft)'
+                                            ])
+                                            ->reactive()
+                                            ->required(),
+
+                                        \Filament\Forms\Components\Textarea::make('comment')
+                                            ->label('Motivo del Rechazo / Comentarios de Aprobación')
+                                            ->rows(3)
+                                            ->required(fn($get) => $get('status') === 'draft'), // Obligatorio si rechaza
+                    
                                         \Filament\Forms\Components\TextInput::make('password_confirmation')
-                                            ->label('Confirma tu Contraseña para Firmar')
+                                            ->label('Confirma tu Contraseña para Validar Firma')
                                             ->password()
-                                            ->required()
+                                            ->visible(fn($get) => $get('status') === 'aprobado')
+                                            ->required(fn($get) => $get('status') === 'aprobado')
                                             ->rules(['current_password']),
                                     ];
                                 }
 
+                                // 2. Opciones para el Creador (Responsable 'R')
                                 if ($user->default_raci_type === 'R' && $record->status === 'draft') {
                                     $options = ['terminado' => 'Enviar a Revisión (Terminado)'];
-                                } elseif ($user->default_raci_type === 'C' && $record->status === 'terminado') {
-                                    $options = ['revisado' => 'Aceptar y Enviar a CISO (Revisado)'];
+                                }
+
+                                // 3. Opciones para el Revisor (Consultado 'C')
+                                elseif ($user->default_raci_type === 'C' && $record->status === 'terminado') {
+                                    $options = [
+                                        'revisado' => 'Aceptar y Enviar a CISO (Revisado)',
+                                        'draft' => '❌ Rechazar y Devolver a Creador (Draft)'
+                                    ];
                                 }
 
                                 return [
                                     \Filament\Forms\Components\Select::make('status')
                                         ->label('Siguiente Paso en el Flujo TISAX')
                                         ->options($options)
+                                        ->reactive()
                                         ->required(),
+
+                                    \Filament\Forms\Components\Textarea::make('comment')
+                                        ->label('Motivo del Rechazo / Comentarios de Aprobación')
+                                        ->rows(3)
+                                        // 🚀 CORRECTO: $get aquí lee el Select 'status' del MODAL en tiempo real, no el modelo.
+                                        ->required(fn($get) => $get('status') === 'draft'),
+
+                                    \Filament\Forms\Components\TextInput::make('password_confirmation')
+                                        ->label('Confirma tu Contraseña para Validar Firma')
+                                        ->password()
+                                        // 🚀 CORRECTO: $get evalúa el Select del formulario del modal.
+                                        ->visible(fn($get) => $get('status') === 'aprobado')
+                                        ->required(fn($get) => $get('status') === 'aprobado')
+                                        ->rules(['current_password']), // Obligatorio si se regresa a borrador
                                 ];
                             })
                             ->visible(function ($record) {
@@ -236,8 +299,16 @@ class DocumentVersionsTable
                             })
                             ->action(function (array $data, $record): void {
                                 $user = auth()->user();
+                                $timestamp = now()->format('d/m/Y H:i');
 
-                                if ($user->default_raci_type === 'A' && $record->status === 'revisado') {
+                                // Formateamos el comentario con saltos de línea para mantener el historial limpio
+                                $nuevoComentario = "";
+                                if (!empty($data['comment'])) {
+                                    $nuevoComentario = "<br><small class='text-gray-500'>[{$timestamp}] {$user->name} ({$user->default_raci_type}):</small> " . e($data['comment']);
+                                }
+
+                                // Flujo especial: El CISO aprueba el documento con Firma Electrónica SHA-256
+                                if ($user->default_raci_type === 'A' && $record->status === 'revisado' && $data['status'] === 'aprobado') {
                                     $cadenaParaHash = $record->id . '|' . $record->file_path . '|' . $user->email . '|' . now()->toIso8601String();
                                     $signatureHash = hash('sha256', $cadenaParaHash);
 
@@ -251,7 +322,13 @@ class DocumentVersionsTable
                                         'signed_at' => now(),
                                     ]);
 
-                                    $record->update(['status' => 'aprobado']);
+                                    // Acumulamos la bitácora de cambios
+                                    $historialActualizado = $record->change_description . ($nuevoComentario ?: "<br><small class='text-gray-500'>[{$timestamp}]</small> Documento firmado electrónicamente por CISO.");
+
+                                    $record->update([
+                                        'status' => 'aprobado',
+                                        'change_description' => $historialActualizado
+                                    ]);
 
                                     \Filament\Notifications\Notification::make()
                                         ->title('Documento Firmado y Publicado')
@@ -259,11 +336,22 @@ class DocumentVersionsTable
                                         ->success()
                                         ->send();
                                 } else {
+                                    // Flujo general o rechazo a borrador (Draft)
                                     if (isset($data['status'])) {
-                                        $record->update(['status' => $data['status']]);
+                                        // Acumulamos el comentario nuevo en la descripción de cambios existente sin borrar el pasado
+                                        $historialActualizado = $record->change_description . $nuevoComentario;
+
+                                        $record->update([
+                                            'status' => $data['status'],
+                                            'change_description' => $historialActualizado
+                                        ]);
+
+                                        $mensajeTitulo = $data['status'] === 'draft' ? 'Documento Rechazado' : 'Flujo Avanzado Exitosamente';
+                                        $mensajeCuerpo = $data['status'] === 'draft' ? 'El registro fue devuelto a borrador para su corrección.' : "El documento cambió al estado: " . strtoupper($data['status']);
+
                                         \Filament\Notifications\Notification::make()
-                                            ->title('Flujo Avanzado Exitosamente')
-                                            ->body("El documento cambió al estado: " . strtoupper($data['status']))
+                                            ->title($mensajeTitulo)
+                                            ->body($mensajeCuerpo)
                                             ->success()
                                             ->send();
                                     }

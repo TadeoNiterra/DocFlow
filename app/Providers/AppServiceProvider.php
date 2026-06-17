@@ -2,23 +2,20 @@
 
 namespace App\Providers;
 
+use App\Models\DocumentVersion; // 🚀 Importante
+use App\Observers\DocumentVersionObserver; // 🚀 Importante
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        //
+        // 🔥 Vinculación obligatoria del Modelo con su Observer
+        DocumentVersion::observe(DocumentVersionObserver::class);
     }
 }
