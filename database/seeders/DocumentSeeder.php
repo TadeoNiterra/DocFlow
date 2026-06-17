@@ -3,83 +3,43 @@
 namespace Database\Seeders;
 
 use App\Models\Document;
-use App\Models\DocumentVersion;
-use App\Models\User as Users;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
-class User extends Seeder
+class DocumentSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $password = Hash::make('PasswordSeguro123!');
-
-        // --- Usuarios ---
-        $ciso = Users::create([
-            'name' => 'Jesus Marron',
-            'email' => 'jesus.marron@niterragroup.com',
-            'password' => $password,
-            'role' => 'Administrador',
-            'default_raci_type' => 'R',
-            'is_active' => true,
-        ]);
-
-        $liderSgsi = Users::create([
-            'name' => 'Jorge Guzman',
-            'email' => 'jorge.guzman@niterragroup.com',
-            'password' => $password,
-            'default_raci_type' => 'R',
-            'role' => 'Administrador',
-            'is_active' => true,
-        ]);
-
-        $auditorTI = Users::create([
-            'name' => 'Jose Tadeo',
-            'email' => 'jose.tadeo@niterragroup.com',
-            'password' => $password,
-            'default_raci_type' => 'C',
-            'role' => 'Administrador',
-            'is_active' => true,
-        ]);
-
-        $directorGeneral = Users::create([
-            'name' => 'Takahiro Arakawa',
-            'email' => 'takahiro.arakawa@niterragroup.com',
-            'password' => $password,
-            'default_raci_type' => 'A',
-            'role' => 'Administrador',
-            'is_active' => true,
-        ]);
-
-        // --- Listado de Documentos Estructurados ---
+         // --- Listado de Documentos Estructurados ---
         $documents = [
-            // Raíz
+           // Formatos
+            ['code' => 'F-ADM-08', 'name' => 'Inventario de activo fijo', 'type' => 'Formato'],
+            ['code' => 'F-ADM-09', 'name' => 'Programa de mantenimiento preventivo', 'type' => 'Formato'],
+            ['code' => 'F-ADM-18', 'name' => 'Inventario de activos de IT', 'type' => 'Formato'],
+            ['code' => 'F-IT-01', 'name' => 'Carta responsiva', 'type' => 'Formato'],
+            ['code' => 'F-IT-02', 'name' => 'Matriz de Derechos y Privilegios', 'type' => 'Formato'],
+            ['code' => 'F-IT-03', 'name' => 'Checklist de Equipo de cómputo', 'type' => 'Formato'],
+            ['code' => 'F-IT-04', 'name' => 'Formato de desmantelamiento y eliminación', 'type' => 'Formato'],
+            ['code' => 'F-IT-05', 'name' => 'Matriz de riesgos de seguridad de la información', 'type' => 'Formato'],
+            ['code' => 'F-IT-06', 'name' => 'Evaluación de riesgos de proyectos', 'type' => 'Formato'],
+            ['code' => 'F-IT-07', 'name' => 'Declaración de aplicabilidad (SoA)', 'type' => 'Formato'],
+            ['code' => 'F-IT-08', 'name' => 'Matriz RASIC', 'type' => 'Formato'],
+            ['code' => 'F-IT-09', 'name' => 'Análisis de riesgos en proyecto', 'type' => 'Formato'],
+            ['code' => 'F-IT-10', 'name' => 'Flujo atención a incidentes', 'type' => 'Formato'],
             ['code' => 'F-IT-11', 'name' => 'Reporte de prueba de continuidad', 'type' => 'Formato'],
             ['code' => 'F-IT-12', 'name' => 'Plan de continuidad de negocio (BCP)', 'type' => 'Formato'],
-            ['code' => 'F-IT-17', 'name' => 'RASIC BCP-DRP', 'type' => 'Formato'],
-            ['code' => 'F-IT-18', 'name' => 'Plan específico de recuperación', 'type' => 'Formato'],
+            ['code' => 'F-IT-13', 'name' => 'Registro de restauración de base de datos', 'type' => 'Formato'],
+            ['code' => 'F-IT-14', 'name' => 'Control de usuario de mantenimiento ', 'type' => 'Formato'],
+            ['code' => 'F-IT-15', 'name' => 'Planificación y seguimiento de objetivos de seguridad y continuidad', 'type' => 'Formato'],
+            ['code' => 'F-IT-16', 'name' => 'Plan de recuperación en caso de interrupción (DRP)', 'type' => 'Formato'],
+            ['code' => 'F-IT-17', 'name' => 'Matriz RASIC BCP-DRP', 'type' => 'Formato'],
+            ['code' => 'F-IT-18', 'name' => 'Plan especifico de recuperación en caso de interrupción', 'type' => 'Formato'],
             ['code' => 'F-IT-19', 'name' => 'Plan de manejo de crisis (CMP)', 'type' => 'Formato'],
             ['code' => 'F-IT-20', 'name' => 'Matriz de riesgos de continuidad de negocio', 'type' => 'Formato'],
-            ['code' => 'M-IT-01', 'name' => 'Guía de referencia para el plan de continuidad', 'type' => 'Manual'],
-
-            // Formatos
-            ['code' => 'F-ADM-18', 'name' => 'Inventario de activos de IT', 'type' => 'Formato'],
-            ['code' => 'F-IT-02', 'name' => 'Matriz de derechos y privilegios', 'type' => 'Formato'],
-            ['code' => 'F-IT-04', 'name' => 'Formato de desmantelamiento y eliminación', 'type' => 'Formato'],
-            ['code' => 'F-IT-05', 'name' => 'Matriz de Riesgos', 'type' => 'Formato'],
-            ['code' => 'F-IT-07', 'name' => 'Declaración de aplicabilidad (SoA)', 'type' => 'Formato'],
-            ['code' => 'F-IT-09', 'name' => 'Análisis de riesgos de proyecto', 'type' => 'Formato'],
-            ['code' => 'F-IT-10', 'name' => 'Flujo de atencion a incidentes', 'type' => 'Formato'],
-            ['code' => 'F-IT-12-DRP', 'name' => 'Plan de recuperación de desastres y continuidad de negocio', 'type' => 'Formato'],
-            ['code' => 'F-IT-13', 'name' => 'Formato de registro de restauración de base de datos', 'type' => 'Formato'],
-            ['code' => 'F-IT-14', 'name' => 'Control de usuarios de mantenimiento', 'type' => 'Formato'],
             ['code' => 'F-IT-21', 'name' => 'Control de eliminación de usuarios', 'type' => 'Formato'],
             ['code' => 'F-IT-22', 'name' => 'Evaluación de seguridad con proveedores', 'type' => 'Formato'],
-            ['code' => 'F-LOG-(T)-01', 'name' => 'Seleccion, evaluacion del proveedor', 'type' => 'Formato'],
-            ['code' => 'F-SGI-22', 'name' => 'Plan de Gestión de Cambios', 'type' => 'Formato'],
 
             // Instructivos
             ['code' => 'IT-IT-01', 'name' => 'Instructivo de gestión de vulnerabilidad técnica', 'type' => 'Instructivo'],
@@ -128,16 +88,6 @@ class User extends Seeder
                 'name' => $docData['name'],
                 'description' => 'Documentación inicial migrada del sistema de archivos.',
                 'type' => $docData['type'],
-            ]);
-
-            DocumentVersion::create([
-                'document_id' => $doc->id,
-                'version_number' => 'Rev.0', // Forzado a Rev. 0 / v0 como solicitaste
-                'change_description' => 'Carga inicial del documento.',
-                'file_path' => '',
-                'file_name' => '',
-                'status' => 'draft',
-                'user_id' => $auditorTI->id, // Asignado por defecto al Director General
             ]);
         }
     }
