@@ -54,7 +54,7 @@ class VdaControlForm
                         Tab::make('Vincular Evidencia')
                             ->icon('heroicon-o-arrow-up-on-square-stack')
                             ->schema([
-                                Section::make('Nueva Evidencia')
+                                Section::make(fn () => 'Nueva Evidencia')
                                     ->schema([
                                         TextInput::make('new_evidence_name')
                                             ->label('Nombre Evidencia')
@@ -83,7 +83,7 @@ class VdaControlForm
                                             ->label('Documento DocFlow')
                                             ->options(
                                                 fn() => DocumentVersion::query()
-                                                    ->where('status', 'aprobado')
+                                                    ->where(fn () => 'status', 'aprobado')
                                                     ->pluck('file_name', 'id')
                                             )
                                             ->searchable()
@@ -100,7 +100,7 @@ class VdaControlForm
                                         Action::make('saveEvidence')
                                             ->label('Guardar Evidencia')
                                             ->icon('heroicon-m-plus')
-                                            ->color('success')
+                                            ->color(fn () => 'success')
                                             ->action(function ($record, array $state, $set) {
                                                 $filePath = null;
 
@@ -179,7 +179,7 @@ class VdaControlForm
                                                         Action::make('view_' . $evidence->id)
                                                             ->label('')
                                                             ->icon('heroicon-m-eye')
-                                                            ->color('success')
+                                                            ->color(fn () => 'success')
                                                             ->url(fn() => $evidence->type === 'url' ? $evidence->external_url : null)
                                                             ->openUrlInNewTab(fn() => $evidence->type === 'url')
                                                             ->modalSubmitAction(false)
@@ -234,7 +234,7 @@ class VdaControlForm
                                                         Action::make('delete_' . $evidence->id)
                                                             ->label('')
                                                             ->icon('heroicon-m-trash')
-                                                            ->color('danger')
+                                                            ->color(fn () => 'danger')
                                                             ->requiresConfirmation()
                                                             ->action(function () use ($evidence) {
                                                                 $evidence->delete();

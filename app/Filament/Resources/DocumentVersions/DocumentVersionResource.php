@@ -62,7 +62,7 @@ class DocumentVersionResource extends Resource
 
         // Si no hay ningún usuario logueado por seguridad solo devolvemos los aprobados
         if (!$user) {
-            return $query->where('status', 'aprobado');
+            return $query->where(fn () => 'status', 'aprobado');
         }
 
         // [ R ] RESPONSABLE: Les aparece draft, terminado, revisado y aprobado (Es decir, todos)
@@ -82,7 +82,7 @@ class DocumentVersionResource extends Resource
 
         // [ I ] INFORMADO: Les aparece únicamente aprobado
         if ($user->default_raci_type === 'I') {
-            return $query->where('status', 'aprobado');
+            return $query->where(fn () => 'status', 'aprobado');
         }
 
         // Fallback de seguridad por si existe otro rol no contemplado

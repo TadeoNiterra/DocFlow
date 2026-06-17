@@ -37,7 +37,7 @@ class DocumentsTable
                         : 'Sin Versión'
                     )
                     ->badge()
-                    ->color('warning')
+                    ->color(fn () => 'warning')
                     ->alignCenter(),
 
                 TextColumn::make('type')

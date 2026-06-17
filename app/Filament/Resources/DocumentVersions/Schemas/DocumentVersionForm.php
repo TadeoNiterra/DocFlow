@@ -18,7 +18,7 @@ class DocumentVersionForm
         return $schema
             ->components([
                 // SECCIÓN 1: ASIGNACIÓN DEL DOCUMENTO MAESTRO
-                Section::make('Documento Asociado')
+                Section::make(fn () => 'Documento Asociado')
                     ->description('Selecciona el documento maestro al que pertenece esta revisión.')
                     ->schema([
                         Select::make('document_id')
@@ -31,7 +31,7 @@ class DocumentVersionForm
                     ]),
 
                 // SECCIÓN 2: CONTROL DE ARCHIVOS Y REVISIÓN INDIVIDUAL
-                Section::make('Detalles de la Nueva Versión / Revisión')
+                Section::make(fn () => 'Detalles de la Nueva Versión / Revisión')
                     ->description('Carga un archivo físico individual para esta versión del documento.')
                     ->schema([
                         TextInput::make('version_number')

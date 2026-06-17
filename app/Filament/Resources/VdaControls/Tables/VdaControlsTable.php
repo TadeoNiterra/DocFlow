@@ -26,7 +26,7 @@ class VdaControlsTable
                 TextColumn::make('number')
                     ->label('Código')
                     ->fontFamily('mono')
-                    ->color('primary')
+                    ->color(fn () => 'primary')
                     ->alignCenter(),
 
                 TextColumn::make('name')
@@ -35,7 +35,7 @@ class VdaControlsTable
 
                 TextColumn::make('evidences_count')
                     ->label('Evidencias')
-                    ->counts('evidences')
+                    ->counts(fn () => 'evidences')
                     ->badge()
                     ->color(
                         fn($state) =>
@@ -96,7 +96,7 @@ class VdaControlsTable
                 EditAction::make()
                     ->label('Auditar / Evidencias')
                     ->icon('heroicon-m-clipboard-document-check')
-                    ->color('warning')
+                    ->color(fn () => 'warning')
                     ->visible(
                         fn($record) =>
                         $record->parent &&
