@@ -23,18 +23,15 @@ class VdaControlsTable
             })
 
             ->columns([
-
                 TextColumn::make('number')
                     ->label('Código')
                     ->fontFamily('mono')
                     ->color('primary')
                     ->alignCenter(),
 
-
                 TextColumn::make('name')
                     ->label('Criterio / Requisito de Evaluación VDA')
                     ->wrap(),
-
 
                 TextColumn::make('evidences_count')
                     ->label('Evidencias')
@@ -51,9 +48,16 @@ class VdaControlsTable
 
             ->groups([
 
+                // 📁 CONFIGURACIÓN DEL GRUPO TEMA CORREGIDA PARA SQL SERVER
                 Group::make('tema')
                     ->label('Tema')
                     ->collapsible()
+
+                    // 💡 SOLUCIÓN: Le decimos a SQL Server que ordene usando la columna real 'sort_order'
+                    // en lugar de buscar una columna llamada 'tema'
+                    ->orderQueryUsing(function ($query, $direction) {
+                        return $query->orderBy('sort_order', $direction);
+                    })
 
                     ->getKeyFromRecordUsing(
                         fn($record) =>
@@ -61,28 +65,25 @@ class VdaControlsTable
                     )
 
                     ->getTitleFromRecordUsing(function ($record) {
-
                         $tema = $record->parent->parent;
-
                         return "📁 Tema {$tema->number}: {$tema->name}";
                     }),
 
                 Group::make('subtema')
                     ->label('Subtema')
                     ->collapsible()
-
+                    // Si el subtema también necesita respetar el ordenamiento de sort_order:
+                    ->orderQueryUsing(function ($query, $direction) {
+                        return $query->orderBy('sort_order', $direction);
+                    })
                     ->getKeyFromRecordUsing(
                         fn($record) =>
                         (string) $record->parent->id
                     )
-
                     ->getTitleFromRecordUsing(function ($record) {
-
                         $subtema = $record->parent;
-
                         return "📋 Subtema {$subtema->number}: {$subtema->name}";
                     }),
-
             ])
 
             ->defaultGroup('tema')
@@ -92,18 +93,15 @@ class VdaControlsTable
             ->paginated(false)
 
             ->actions([
-
                 EditAction::make()
                     ->label('Auditar / Evidencias')
                     ->icon('heroicon-m-clipboard-document-check')
                     ->color('warning')
-
                     ->visible(
                         fn($record) =>
                         $record->parent &&
                         $record->parent->parent
                     ),
-
             ]);
     }
 }

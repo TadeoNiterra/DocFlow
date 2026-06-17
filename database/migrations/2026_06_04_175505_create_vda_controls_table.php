@@ -13,8 +13,13 @@ return new class extends Migration {
         Schema::create('vda_controls', function (Blueprint $table) {
             $table->id();
             // Clave para la jerarquía: apunta a sí misma
-            $table->foreignId('parent_id')->nullable()->constrained('vda_controls')->cascadeOnDelete();
+            $table->unsignedBigInteger('parent_id')->nullable();
 
+            // 2. Creamos la llave foránea de forma manual con la regla estricta para SQL Server
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('vda_controls')
+                ->onDelete('no action');
             $table->string('number'); // Ej: "1", "1.1", "1.1.1"
             $table->string('name');   // Ej: "Information Security Policies"
             $table->text('description')->nullable(); // Explicación teórica del punto

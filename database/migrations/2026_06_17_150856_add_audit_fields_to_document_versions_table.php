@@ -8,14 +8,25 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('document_versions', function (Blueprint $table) {
-            // Relaciones con la tabla de usuarios (pueden ser nulos al inicio)
-            $table->foreignId('created_by_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('reviewed_by_id')->nullable()->constrained('users')->nullOnDelete();
+            // 1. Creamos las columnas primero como enteros normales que aceptan nulos
+            $table->unsignedBigInteger('created_by_id')->nullable();
+            $table->unsignedBigInteger('reviewed_by_id')->nullable();
 
             // Fechas de control de cambios TISAX
-            $table->timestamp('reviewed_at')->nullable();       // Fecha de revisión
-            $table->timestamp('last_reviewed_at')->nullable();  // Fecha de última revisión
-            $table->timestamp('approved_at')->nullable();       // Fecha de aprobación
+            $table->timestamp('reviewed_at')->nullable();
+            $table->timestamp('last_reviewed_at')->nullable();
+            $table->timestamp('approved_at')->nullable();
+
+            // 2. Declaramos las llaves foráneas con 'no action' para calmar a SQL Server
+            $table->foreign('created_by_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('no action');
+
+            $table->foreign('reviewed_by_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('no action');
         });
     }
 

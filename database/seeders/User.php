@@ -22,7 +22,7 @@ class User extends Seeder
             'name' => 'Jesus Marron',
             'email' => 'jesus.marron@niterragroup.com',
             'password' => $password,
-            'role' => 'admin',
+            'role' => 'Administrador',
             'default_raci_type' => 'R',
             'is_active' => true,
         ]);
@@ -32,6 +32,7 @@ class User extends Seeder
             'email' => 'jorge.guzman@niterragroup.com',
             'password' => $password,
             'default_raci_type' => 'R',
+            'role' => 'Administrador',
             'is_active' => true,
         ]);
 
@@ -40,7 +41,7 @@ class User extends Seeder
             'email' => 'jose.tadeo@niterragroup.com',
             'password' => $password,
             'default_raci_type' => 'C',
-            'role' => 'admin',
+            'role' => 'Administrador',
             'is_active' => true,
         ]);
 
@@ -49,15 +50,7 @@ class User extends Seeder
             'email' => 'takahiro.arakawa@niterragroup.com',
             'password' => $password,
             'default_raci_type' => 'A',
-            'is_active' => true,
-        ]);
-
-        $auditorTI = Users::create([
-            'name' => 'Jose Tadeo',
-            'email' => 'jose.tadeo@niterragroup.com',
-            'password' => $password,
-            'default_raci_type' => 'C',
-            'role' => 'admin',
+            'role' => 'Administrador',
             'is_active' => true,
         ]);
 
