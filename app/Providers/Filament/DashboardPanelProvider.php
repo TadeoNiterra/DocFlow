@@ -38,6 +38,8 @@ class DashboardPanelProvider extends PanelProvider
             ->id('dashboard')
             ->path('dashboard')
             ->login()
+            ->passwordReset()
+            ->profile()
 
             ->databaseNotifications()
 

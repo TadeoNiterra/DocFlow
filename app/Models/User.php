@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
-// 🚀 LA CLAVE: Importamos el contrato contractual de nombres de Filament v5
 use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-// Definición estricta de campos permitidos en el sistema DocFlow
 #[Fillable(['name', 'email', 'password', 'role', 'is_active', 'default_raci_type'])]
-// 🚀 AGREGADO: Vinculamos formalmente el contrato "implements HasName" aquí
 class User extends Authenticatable implements HasName
 {
     use HasFactory, Notifiable;
@@ -26,7 +25,7 @@ class User extends Authenticatable implements HasName
     ];
 
     /**
-     * 🚀 MÉTODO CONTRACTUAL: Intercepta el renderizado de Filament en el Menú Superior y Avatar
+     * MÉTODO CONTRACTUAL: Intercepta el renderizado de Filament en el Menú Superior y Avatar
      */
     public function getFilamentName(): string
     {
@@ -38,7 +37,7 @@ class User extends Authenticatable implements HasName
             default => 'Usuario',
         };
 
-        return "{$this->name} {$rolCompleto}";
+        return "{$this->name} - {$rolCompleto}";
     }
 
     /**
@@ -48,7 +47,51 @@ class User extends Authenticatable implements HasName
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed', // Encripta automáticamente las contraseñas en SQL Server
+            'password' => 'hashed',
         ];
+    }
+
+    /**
+     * 🔥 ENVÍO SEGURO Y DIRECTO EN ESPAÑOL PARA FILAMENT V5
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        // 1. Construimos la URL exacta de recuperación que pide Laravel/Filament
+        $url = url(route('password.reset', [
+            'token' => $token,
+            'email' => $this->getEmailForPasswordReset(),
+        ], false));
+
+        // 2. Creamos la estructura del MailMessage en español
+        $mailMessage = (new MailMessage)
+            ->subject('DocFlow - Recuperación de Contraseña')
+            ->greeting('¡Hola, ' . $this->name . '!')
+            ->line('Estás recibiendo este correo porque hiciste una solicitud de restablecimiento de contraseña para tu cuenta en el sistema DocFlow.')
+            ->action('Restablecer Contraseña', $url)
+            ->line('Este enlace de recuperación expirará en 60 minutos.')
+            ->line('Si tú no realizaste esta solicitud, puedes ignorar este correo de forma segura.')
+            ->salutation('Saludos cordiales, Equipo de Soporte DocFlow.');
+
+        // 3. Encapsulamos el mensaje en una notificación en caliente para evitar problemas de caché
+        $this->notify(
+            new class ($mailMessage) extends Notification {
+            private MailMessage $message;
+
+            public function __construct(MailMessage $message)
+            {
+                $this->message = $message;
+            }
+
+            public function via(object $notifiable): array
+            {
+                return ['mail'];
+            }
+
+            public function toMail(object $notifiable): MailMessage
+            {
+                return $this->message;
+            }
+            }
+        );
     }
 }
