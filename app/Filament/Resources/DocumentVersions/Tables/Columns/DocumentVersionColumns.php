@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\DocumentVersions\Tables\Columns;
 
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Support\Carbon;
 
 class DocumentVersionColumns
 {
@@ -43,6 +44,14 @@ class DocumentVersionColumns
 
             TextColumn::make('reviewed_at')->label('Fecha de Revisión')->dateTime('d/m/Y H:i')->toggleable(isToggledHiddenByDefault: true),
             TextColumn::make('last_reviewed_at')->label('Última Revisión')->dateTime('d/m/Y H:i')->sortable(),
+            TextColumn::make('proxima_revision')->label('Próxima Revisión')->badge()->color(fn($record) => $record->last_reviewed_at ? 'info' : 'gray')->state(function ($record) {
+                    if (empty($record->last_reviewed_at)) {
+                        return 'Pendiente';
+                    }
+                    return Carbon::parse($record->last_reviewed_at)
+                        ->addYear()
+                        ->format('d/m/Y H:i');
+                }),
             TextColumn::make('approved_at')->label('Fecha de Aprobación')->dateTime('d/m/Y H:i')
                 ->description(fn($record) => $record->approved_at ? '🔒 Validación TISAX' : null)->sortable(),
         ];
