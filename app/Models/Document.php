@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,5 +24,12 @@ class Document extends Model
         return $this
             ->hasOne(DocumentVersion::class)
             ->ofMany('version_number', 'max');
+    }
+
+    protected function title(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ?? 'Documento sin título (Revisar Código)',
+        );
     }
 }

@@ -21,10 +21,11 @@ class VdaEvidence extends Model
     protected $fillable = [
         'vda_control_id',
         'name',
-        'type', // 'upload', 'docflow_version', 'url'
+        'type',
         'file_path',
         'external_url',
-        'document_version_id',
+        'document_version_id', // Se mantiene por si usas cargas estáticas históricas
+        'document_id',         // 🔥 AGREGADO: Nueva columna para el Documento Padre
         'user_id',
     ];
 
@@ -52,6 +53,14 @@ class VdaEvidence extends Model
     }
 
     /**
+     * Relación: La evidencia pertenece directamente a un Documento Padre de DocFlow.
+     */
+    public function document(): BelongsTo
+    {
+        return $this->belongsTo(Document::class, 'document_id');
+    }
+
+    /**
      * Relación Opcional: La evidencia puede estar vinculada a una versión firmada de DocFlow.
      */
     public function documentVersion(): BelongsTo
@@ -65,5 +74,20 @@ class VdaEvidence extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+    /**
+     * Obtiene la versión más reciente del documento vinculado de forma dinámica.
+     */
+    public function getLatestDocumentVersionAttribute()
+    {
+        if ($this->type !== 'docflow_version' || !$this->document_id) {
+            return null;
+        }
+
+        // Buscamos directamente en la tabla de versiones usando el document_id (Padre) guardado
+        return DocumentVersion::where('document_id', $this->document_id)
+            ->whereIn('status', ['aprobado', 'aprobado / firmado'])
+            ->orderBy('id', 'desc') // El ID más alto siempre será la última revisión registrada
+            ->first();
     }
 }

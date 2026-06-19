@@ -28,7 +28,7 @@ class DocumentSignature extends Model
      * Casting de tipos de datos automáticos.
      */
     protected $casts = [
-        'signed_at' => 'datetime',
+        'signed_at' => 'datetime', // Fuerza a que Laravel siempre devuelva un objeto Carbon
     ];
 
     /**
