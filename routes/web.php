@@ -5,50 +5,59 @@ use App\Models\VdaEvidence;
 use Illuminate\Support\Facades\Route;
 use App\Models\DocumentVersion;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 
-Route::get('/documentos/{version}/view-pdf', function (DocumentVersion $version) {
-    // 1. Validar que tenga el registro en la BD
-    if (!$version->file_path) {
-        abort(404, 'No hay ninguna ruta de archivo registrada para esta versión en la Base de Datos.');
-    }
+use Illuminate\Support\Facades\Response;
 
-    // DIAGNÓSTICO / SOLUCIÓN AUTOMÁTICA:
-    // Probamos la ruta tal como viene en la BD, y también forzando el prefijo 'private/' por si acaso.
+Route::get('/documentos/{version}/view-pdf', function (DocumentVersion $version, \Illuminate\Http\Request $request) {
+    if (!$version->file_path)
+        abort(404, 'Ruta no registrada.');
+
     $pathOpcion1 = storage_path('app/' . $version->file_path);
     $pathOpcion2 = storage_path('app/private/' . $version->file_path);
+    $pathFisicoFinal = file_exists($pathOpcion1) ? $pathOpcion1 : (file_exists($pathOpcion2) ? $pathOpcion2 : null);
 
-    // Evaluamos cuál de las dos carpetas físicas contiene el archivo real
-    if (file_exists($pathOpcion1)) {
-        $pathFisicoFinal = $pathOpcion1;
-    } elseif (file_exists($pathOpcion2)) {
-        $pathFisicoFinal = $pathOpcion2;
-    } else {
-        // SI NINGUNA EXISTE: Mostramos un mensaje exacto en pantalla para saber qué está buscando
-        dd([
-            'Error' => 'El archivo físico no se encuentra en el servidor.',
-            'Ruta que guardó la Base de Datos' => $version->file_path,
-            'Ruta física donde se buscó (Opción 1)' => $pathOpcion1,
-            'Ruta física donde se buscó (Opción 2)' => $pathOpcion2,
+    if (!$pathFisicoFinal) {
+        abort(404, 'El archivo físico no existe en el servidor.');
+    }
+
+    $extension = strtolower(pathinfo($pathFisicoFinal, PATHINFO_EXTENSION));
+
+    // 🔥 SI EL REQUISITO PIDE EL ARCHIVO CRUDO (Llamado interno desde el fetch de JavaScript)
+    if ($request->has('raw')) {
+        $mimeTypes = [
+            'pdf' => 'application/pdf',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ];
+        return response()->file($pathFisicoFinal, ['Content-Type' => $mimeTypes[$extension] ?? 'application/octet-stream']);
+    }
+
+    // 1. FLUJO ESTÁNDAR PARA PDFs: Se abren directo en el navegador
+    if ($extension === 'pdf') {
+        return response()->file($pathFisicoFinal, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $version->file_name . '"'
         ]);
     }
 
-    // 3. Retornar el archivo directamente al visor del navegador si todo está bien
-    return response()->file($pathFisicoFinal, [
-        'Content-Type' => 'application/pdf',
-        'Content-Disposition' => 'inline; filename="' . $version->file_name . '"'
+    // 2. FLUJO DE OFFICE MASIVO (DOCX, XLSX): Renderiza la vista del visor frontend
+    return view('documentos.visor', [
+        'fileUrl' => route('documentos.ver-pdf', ['version' => $version->id, 'raw' => 1]),
+        'extension' => $extension,
+        'fileName' => $version->file_name ?? 'Documento_DocFlow'
     ]);
 })->name('documentos.ver-pdf')->middleware(['web', 'auth']);
 
 Route::get('/vda/evidence/{evidence}/file', function (Request $request, VdaEvidence $evidence) {
-    
+
     // 🔒 CASO 1: Si es un documento de DocFlow y el puente envió el 'version_id'
     if ($evidence->type === 'docflow_version' || $request->has('version_id')) {
-        
+
         // Extraemos el id de la versión, si no viene en la URL, lo calculamos en caliente como fallback
         $versionId = $request->query('version_id');
-        
-        $version = $versionId 
+
+        $version = $versionId
             ? DocumentVersion::find($versionId)
             : DocumentVersion::where('document_id', $evidence->document_id)
                 ->whereIn('status', ['aprobado', 'aprobado / firmado'])
@@ -60,7 +69,7 @@ Route::get('/vda/evidence/{evidence}/file', function (Request $request, VdaEvide
                 return Storage::disk('local')->response($version->file_path);
             }
         }
-        
+
         abort(404, 'No se encontró ninguna versión aprobada para este documento.');
     }
 

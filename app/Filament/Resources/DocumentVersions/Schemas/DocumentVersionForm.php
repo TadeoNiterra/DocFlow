@@ -37,7 +37,7 @@ class DocumentVersionForm
                         TextInput::make('version_number')
                             ->label('Versión / Revisión')
                             ->required()
-                            ->placeholder('Ej: v1.0')
+                            ->placeholder('Ej: 0, 1, 2,...')
                             ->columnSpan(1),
 
                         FileUpload::make('file_path')

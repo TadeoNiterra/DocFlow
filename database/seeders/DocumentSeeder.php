@@ -40,6 +40,8 @@ class DocumentSeeder extends Seeder
             ['code' => 'F-IT-20', 'name' => 'Matriz de riesgos de continuidad de negocio', 'type' => 'Formato'],
             ['code' => 'F-IT-21', 'name' => 'Control de eliminación de usuarios', 'type' => 'Formato'],
             ['code' => 'F-IT-22', 'name' => 'Evaluación de seguridad con proveedores', 'type' => 'Formato'],
+            ['code' => 'F-LOG-(T)-01', 'name' => 'Seleccion, evaluacion del proveedor', 'type' => 'Formato'],
+            ['code' => 'F-SGI-22', 'name' => 'Plan de Gestión de Cambios', 'type' => 'Formato'],
 
             // Instructivos
             ['code' => 'IT-IT-01', 'name' => 'Instructivo de gestión de vulnerabilidad técnica', 'type' => 'Instructivo'],
@@ -79,6 +81,9 @@ class DocumentSeeder extends Seeder
             ['code' => 'PO-IT-05', 'name' => 'Desarrollo de funciones y aplicaciones', 'type' => 'Procedimiento'],
             ['code' => 'PO-IT-06', 'name' => 'Procedimiento de Respaldos y Copias de Seguridad', 'type' => 'Procedimiento'],
             ['code' => 'PO-IT-07', 'name' => 'Procedimiento de Gestion de Dispositivos de Almacenamiento Extraibles', 'type' => 'Procedimiento'],
+            
+            //Manuales
+            ['code' => 'M-IT-01', 'name' => 'GUÍA DE REFERENCIA PARA EL PLAN DE CONTINUIDAD', 'type' => 'Manual'],
         ];
 
         // --- Inserción Automática en la Base de Datos ---

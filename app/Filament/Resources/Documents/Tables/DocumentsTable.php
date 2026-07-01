@@ -27,13 +27,12 @@ class DocumentsTable
                     ->searchable()
                     ->sortable(),
 
-                // 🚀 ÚLTIMA VERSIÓN VINCULADA DESDE EL MODELO
                 TextColumn::make('latestVersion.version_number')
                     ->label('Última Versión')
                     ->formatStateUsing(
                         fn($state) =>
                         $state
-                        ? "{$state}"
+                        ? "Rev. {$state}"
                         : 'Sin Versión'
                     )
                     ->badge()
