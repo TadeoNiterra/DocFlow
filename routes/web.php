@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Models\DocumentVersion;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use App\Models\FormatoIt04;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use Illuminate\Support\Facades\Response;
 
@@ -88,3 +90,13 @@ Route::get('/vda-evidences/{evidence}/file', [VdaEvidenceController::class, 'get
     ->name('vda.evidence.file');
 
 Route::redirect('/', '/dashboard');
+// Ruta para visualizar el PDF del Formato F-IT-04
+Route::middleware(['web', 'auth'])->get('/formatos/f-it-04/{record}/preview', function (FormatoIt04 $record) {
+    $pdf = Pdf::loadView('pdf.formato-it04', ['record' => $record]);
+    
+    // 'inline' le indica al navegador que lo abra en el visor integrado en lugar de descargarlo
+    return response($pdf->output(), 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="F-IT-04-' . $record->folio . '.pdf"',
+    ]);
+})->name('formato-it04.preview-pdf');
