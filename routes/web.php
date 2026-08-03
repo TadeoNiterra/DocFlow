@@ -100,3 +100,11 @@ Route::middleware(['web', 'auth'])->group(function () {
         return $disk->download($evidencia->ruta_archivo, $evidencia->nombre_archivo);
     })->name('formato-it09.download-evidencia');
 });
+// Formato F-IT-11
+Route::get('/formatos/f-it-11/{record}/preview', function (\App\Models\FormatoIt11Reporte $record) {
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.formato-it11', compact('record'));
+    return response($pdf->output(), 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => "inline; filename=\"{$record->folio}.pdf\"",
+    ]);
+})->name('formato-it11.preview-pdf');
