@@ -19,7 +19,7 @@ class FormatoIt04Resource extends Resource
 
     // 📌 Configuración de Navegación v5
     protected static UnitEnum|string|null $navigationGroup = 'Formatos SGSI';
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedComputerDesktop;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentText;
     protected static ?string $navigationLabel = 'F-IT-04 Desmantelamiento';
     protected static ?string $modelLabel = 'Formato F-IT-04';
     protected static ?string $pluralModelLabel = 'Formatos F-IT-04';
