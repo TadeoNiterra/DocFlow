@@ -19,7 +19,7 @@ class VdaControlResource extends Resource
     protected static ?string $model = VdaControl::class;
 
     // 🚀 Icono oficial de escudo/cumplimiento normativo
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShieldCheck;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ShieldCheck;
 
     protected static ?string $navigationLabel = 'Estructura VDA / TISAX';
     protected static ?string $modelLabel = 'Control VDA';

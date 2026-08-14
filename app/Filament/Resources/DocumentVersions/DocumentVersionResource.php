@@ -21,7 +21,7 @@ class DocumentVersionResource extends Resource
 
     // Cambia estas dos propiedades estáticas dentro de tu DocumentVersionResource:
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentArrowUp;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentArrowUp;
 
     public static function getPluralModelLabel(): string
     {
