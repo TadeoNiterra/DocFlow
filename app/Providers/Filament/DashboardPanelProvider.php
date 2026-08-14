@@ -20,8 +20,6 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Widgets\StatsOverview;
 use App\Filament\Widgets\DocumentTypeChart;
-
-// 🚀 IMPORTACIONES CLAVE PARA FILAMENT V5 (Navegación y Modales)
 use Filament\Navigation\MenuItem;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
@@ -87,6 +85,11 @@ class DashboardPanelProvider extends PanelProvider
                     ->label('Formatos SGSI')
                     ->icon('heroicon-o-folder-open')
                     ->collapsible(true),
+                NavigationGroup::make()
+                    ->label('F-IT-02 Matriz Derechos')
+                    ->icon('heroicon-o-document-text')
+                    ->collapsible(true),   
             ]);
+            
     }
 }

@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             DocumentSeeder::class,
             VdaControlSeeder::class,
-            //DocumentVersionSeeder::class,
+            FormatoIt02Seeder::class,
         ]);
     }
 }

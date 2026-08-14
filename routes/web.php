@@ -10,6 +10,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use App\Models\FormatoIt02Categoria;
+use App\Models\FormatoIt02Permiso;
+use App\Models\FormatoIt02Rol;
 
 // Redirección raíz
 Route::redirect('/', '/dashboard');
@@ -108,3 +111,39 @@ Route::get('/formatos/f-it-11/{record}/preview', function (\App\Models\FormatoIt
         'Content-Disposition' => "inline; filename=\"{$record->folio}.pdf\"",
     ]);
 })->name('formato-it11.preview-pdf');
+// Formato F-IT-18 PER
+Route::get('/formatos/f-it-18/{record}/preview', function (\App\Models\FormatoIt18Plan $record) {
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.formato-it18', compact('record'));
+    return response($pdf->output(), 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => "inline; filename=\"{$record->folio}.pdf\"",
+    ]);
+})->name('formato-it18.preview-pdf');
+Route::get('/formatos/f-it-02/pdf', function () {
+    $roles = FormatoIt02Rol::orderBy('orden')->get();
+
+    $categoriasFunciones = FormatoIt02Categoria::where('matriz_tipo', 'funciones')
+        ->with('funciones')
+        ->orderBy('orden')
+        ->get();
+
+    $categoriasRecursos = FormatoIt02Categoria::where('matriz_tipo', 'recursos')
+        ->with('funciones')
+        ->orderBy('orden')
+        ->get();
+
+    $permisos = FormatoIt02Permiso::all();
+    $permisosMap = [];
+    foreach ($permisos as $p) {
+        $permisosMap[$p->rol_id][$p->funcion_id] = $p->valor;
+    }
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.formato-it02', compact(
+        'roles', 'categoriasFunciones', 'categoriasRecursos', 'permisosMap'
+    ))->setPaper('letter', 'landscape');
+
+    return response($pdf->output(), 200, [
+        'Content-Type'        => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="F-IT-02_Matriz_Derechos_y_Privilegios.pdf"',
+    ]);
+})->name('formato-it02.pdf');
