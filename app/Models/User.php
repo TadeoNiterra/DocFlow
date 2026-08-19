@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Notifiable;
 
 #[Fillable(['name', 'email', 'password', 'role', 'is_active', 'default_raci_type'])]
 class User extends Authenticatable implements HasName
@@ -48,11 +50,12 @@ class User extends Authenticatable implements HasName
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
     /**
-     * 🔥 ENVÍO SEGURO Y DIRECTO EN ESPAÑOL PARA FILAMENT V5
+     * ENVÍO SEGURO Y DIRECTO EN ESPAÑOL PARA FILAMENT
      */
     public function sendPasswordResetNotification($token): void
     {

@@ -25,6 +25,7 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Facades\Hash;
 use Filament\Notifications\Notification;
+use App\Filament\Pages\Auth\CustomLogin;
 
 class DashboardPanelProvider extends PanelProvider
 {
@@ -34,7 +35,7 @@ class DashboardPanelProvider extends PanelProvider
             ->default()
             ->id('dashboard')
             ->path('dashboard')
-            ->login()
+            ->login(CustomLogin::class)
             ->passwordReset()
             ->profile()
 
