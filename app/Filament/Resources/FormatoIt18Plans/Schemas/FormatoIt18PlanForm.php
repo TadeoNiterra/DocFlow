@@ -27,7 +27,8 @@ class FormatoIt18PlanForm
                             ->label('Folio PER')
                             ->required()
                             ->default(fn() => FormatoIt18Plan::generarFolioNext())
-                            ->disabled(),
+                            ->readOnly()
+                            ->dehydrated(),
 
                         DatePicker::make('fecha_elaboracion')
                             ->label('Fecha de Elaboración')
@@ -111,13 +112,14 @@ class FormatoIt18PlanForm
                                 TextInput::make('fase_nombre')
                                     ->label('Fase')
                                     ->disabled()
+                                    ->dehydrated()
                                     ->columnSpan(2),
 
                                 Select::make('tipo_metrico')
                                     ->label('Métrico')
                                     ->options(['RPO' => 'RPO', 'RTO' => 'RTO', 'N/A' => 'N/A'])
-                                    ->disabled()    // 🟢 Deshabilita la edición del Select
-                                    ->dehydrated()  // 🟢 Asegura que el valor predeterminado se guarde en la BD
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->columnSpan(1),
 
                                 TextInput::make('tiempo_horas')
@@ -153,21 +155,24 @@ class FormatoIt18PlanForm
                         TextInput::make('rpo_global')
                             ->label('RPO Global (h)')
                             ->numeric()
-                            ->disabled()
+                            ->default(0)
+                            ->readOnly()
                             ->dehydrated()
                             ->columnSpan(1),
 
                         TextInput::make('rto_global')
                             ->label('RTO Global (h)')
                             ->numeric()
-                            ->disabled()
+                            ->default(0)
+                            ->readOnly()
                             ->dehydrated()
                             ->columnSpan(1),
 
                         TextInput::make('mtd')
                             ->label('MTD (RPO + RTO) (h)')
                             ->numeric()
-                            ->disabled()
+                            ->default(0)
+                            ->readOnly()
                             ->dehydrated()
                             ->columnSpan(1),
                     ])
@@ -219,10 +224,10 @@ class FormatoIt18PlanForm
             ]);
     }
 
-    // Cálculo automático reactivo de RPO, RTO y MTD
+    // Cálculo automático reactivo apuntando a la raíz mediante navegación de contexto ('../../')
     protected static function recalcularMetricos(Set $set, Get $get): void
     {
-        $fases = $get('fases') ?? [];
+        $fases = $get('../../fases') ?? $get('fases') ?? [];
         $rpo = 0;
         $rto = 0;
 
@@ -237,6 +242,12 @@ class FormatoIt18PlanForm
             }
         }
 
+        // Asignación al nivel raíz del formulario
+        $set('../../rpo_global', $rpo);
+        $set('../../rto_global', $rto);
+        $set('../../mtd', $rpo + $rto);
+
+        // Asignación de fallback
         $set('rpo_global', $rpo);
         $set('rto_global', $rto);
         $set('mtd', $rpo + $rto);
