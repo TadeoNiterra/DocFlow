@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\DocumentVersions\Tables\Actions;
 
 use App\Models\DocumentVersion;
+use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\BulkAction;
@@ -23,7 +24,7 @@ class DocumentVersionActions
     public static function makeRowActions(): array
     {
         return [
-            ViewAction::make() // Ahora compilará de forma perfecta
+            ViewAction::make()
                 ->label('Ver Detalles')
                 ->color('info')
                 ->infolist(fn($infolist) => self::buildInfolistSchema($infolist))
@@ -67,12 +68,13 @@ class DocumentVersionActions
             ]),
         ];
     }
+
     private static function buildInfolistSchema($infolist)
     {
         return $infolist->schema([
-            Section::make(fn() =>'Historial y Registro de Cambios')->schema([
+            Section::make(fn() => 'Historial y Registro de Cambios')->schema([
                 TextEntry::make('document.name')->label('Documento Maestro'),
-                TextEntry::make('version_number')->label('Versión')->badge()->color(fn() =>'warning'),
+                TextEntry::make('version_number')->label('Versión')->badge()->color(fn() => 'warning'),
                 TextEntry::make('status')->label('Estado Actual')->badge()
                     ->color(fn($state) => match ($state) { 'draft' => 'gray', 'terminado' => 'info', 'revisado' => 'purple', 'aprobado' => 'success', default => 'transparent'}),
                 TextEntry::make('file_name')->label('Archivo Original'),
@@ -81,8 +83,8 @@ class DocumentVersionActions
                 TextEntry::make('change_description')->label('Descripción')->columnSpanFull()->html(),
             ])->columns(2),
 
-            Section::make(fn() =>'Trazabilidad e Inmutabilidad de Firma')->schema([
-                Section::make(fn() =>'📥 1. Proceso de Elaboración')->compact()->schema([
+            Section::make(fn() => 'Trazabilidad e Inmutabilidad de Firma')->schema([
+                Section::make(fn() => '📥 1. Proceso de Elaboración')->compact()->schema([
                     TextEntry::make('created_by')->label('Elaborado Por')->weight(FontWeight::Bold)->state(fn($record) => $record->creator?->name ?? 'Sistema'),
                     TextEntry::make('created_at_time')->label('Fecha')
                         ->state(fn($record) => $record->created_at ? \Carbon\Carbon::parse($record->created_at)->format('d/m/Y H:i:s') : 'N/A'),
@@ -90,16 +92,14 @@ class DocumentVersionActions
 
                 Section::make(fn() => '🔍 2. Proceso de Revisión')->compact()->schema([
                     TextEntry::make('reviewed_by')->label('Revisado Por')->weight(FontWeight::Bold)->color('warning')->state(fn($record) => $record->reviewer?->name ?? 'Pendiente'),
-                    // 🔥 CORREGIDO: Envolvemos reviewed_at en Carbon::parse para mitigar strings de SQLite
                     TextEntry::make('reviewed_at_time')->label('Fecha')
                         ->state(fn($record) => $record->reviewed_at ? \Carbon\Carbon::parse($record->reviewed_at)->format('d/m/Y H:i:s') : 'N/A'),
                 ])->columns(2),
 
-                Section::make(fn() =>'🖋️ 3. Autorización y Sello Digital')->compact()->schema([
+                Section::make(fn() => '🖋️ 3. Autorización y Sello Digital')->compact()->schema([
                     Grid::make(2)->schema([
                         TextEntry::make('signed_by_name')->label('Autorizado Por')->weight(FontWeight::Bold)->color('success')->state(fn($record) => $record->signatures->first()?->user_name_snapshot ?? 'Pendiente'),
                         TextEntry::make('signed_by_email')->label('Correo')->state(fn($record) => $record->signatures->first()?->user_email_snapshot),
-                        // 🔥 CORREGIDO: Envolvemos signed_at en Carbon::parse para mitigar strings de SQLite
                         TextEntry::make('signed_at_time')->label('Fecha')
                             ->state(function ($record) {
                                 $signedAt = $record->signatures->first()?->signed_at;
@@ -163,8 +163,9 @@ class DocumentVersionActions
     private static function shouldShowWorkflowAction($record): bool
     {
         $user = auth()->user();
-        if (!$user || $user->default_raci_type === 'I')
+        if (!$user || !$user->is_active || $user->default_raci_type === 'I') // 🟢 Barrera: Usuario inactivo no opera el flujo
             return false;
+
         return ($user->default_raci_type === 'R' && $record->status === 'draft') ||
             ($user->default_raci_type === 'C' && $record->status === 'terminado') ||
             ($user->default_raci_type === 'A' && $record->status === 'revisado');
@@ -188,8 +189,23 @@ class DocumentVersionActions
                 'signed_at' => now(),
             ]);
             $record->update(['status' => 'aprobado', 'change_description' => $record->change_description . ($nuevoComentario ?: "<br><small>[{$timestamp}]</small> Documento firmado por CISO.")]);
+
+            // 🟢 Notificar solo a usuarios activos con rol RACI 'I' (Informados) o Creador
+            self::notifyActiveUsersByRaci(['I'], 'Documento Aprobado', "El documento '{$record->document?->name}' fue aprobado y firmado.");
         } else {
             $record->update(['status' => $data['status'], 'change_description' => $record->change_description . $nuevoComentario]);
+
+            // 🟢 Notificar según el siguiente paso solo a usuarios activos del rol destinatario
+            $targetRaci = match ($data['status']) {
+                'terminado' => 'C', // Notificar a los Consultados (Revisores)
+                'revisado' => 'A', // Notificar a la Autoridad (CISO)
+                'draft' => 'R', // Notificar al Responsable (Creador) en caso de Rechazo
+                default => null
+            };
+
+            if ($targetRaci) {
+                self::notifyActiveUsersByRaci([$targetRaci], 'Cambio de Estado en Documento', "El documento '{$record->document?->name}' cambió su estado a {$data['status']}.");
+            }
         }
         Notification::make()->title('Flujo actualizado')->success()->send();
     }
@@ -220,6 +236,38 @@ class DocumentVersionActions
                 $contador++;
             }
         }
-        $contador > 0 ? Notification::make()->title('Lote Procesado')->body("{$contador} registros actualizados.")->success()->send() : Notification::make()->title('Sin cambios')->warning()->send();
+
+        if ($contador > 0) {
+            Notification::make()->title('Lote Procesado')->body("{$contador} registros actualizados.")->success()->send();
+
+            // 🟢 Notificar el procesamiento masivo sólo a usuarios activos
+            $targetRaci = match ($user->default_raci_type) {
+                'R' => ['C'],
+                'C' => ['A'],
+                'A' => ['I', 'R'],
+                default => []
+            };
+            self::notifyActiveUsersByRaci($targetRaci, 'Procesamiento Masivo de Documentos', "Se actualizaron masivamente {$contador} documentos en el sistema.");
+        } else {
+            Notification::make()->title('Sin cambios')->warning()->send();
+        }
+    }
+
+    /**
+     * 🟢 MÉTODOS PRIVADOS AUXILIARES: Garantiza el envío de notificaciones ÚNICAMENTE a usuarios activos.
+     */
+    private static function notifyActiveUsersByRaci(array $raciRoles, string $title, string $body): void
+    {
+        $usuariosActivos = User::whereIn('default_raci_type', $raciRoles)
+            ->where('is_active', true) // 🔒 Doble candado: Solo usuarios con cuenta activa
+            ->get();
+
+        foreach ($usuariosActivos as $usuario) {
+            Notification::make()
+                ->title($title)
+                ->body($body)
+                ->info()
+                ->sendToDatabase($usuario); // O enviar por Mail si tu clase usa per-mail
+        }
     }
 }

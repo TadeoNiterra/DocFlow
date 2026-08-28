@@ -27,13 +27,13 @@ class MigrarDocumentosMasivo extends Command
     {
         $this->info('🚀 Iniciando escaneo inteligente de archivos en "storage/app/migracion"...');
 
-        // 1. Validar Actores del flujo de Firmas
-        $jesus = User::where('email', 'jesus.marron@niterragroup.com')->first();
-        $jose = User::where('email', 'jose.tadeo@niterragroup.com')->first();
-        $takahiro = User::where('email', 'takahiro.arakawa@niterragroup.com')->first();
+        // 1. Validar Actores del flujo de Firmas (Garantizando que estén activos)
+        $jesus = User::where('email', 'jesus.marron@niterragroup.com')->where('is_active', true)->first();
+        $jose = User::where('email', 'jose.tadeo@niterragroup.com')->where('is_active', true)->first();
+        $takahiro = User::where('email', 'takahiro.arakawa@niterragroup.com')->where('is_active', true)->first();
 
         if (!$jesus || !$jose || !$takahiro) {
-            $this->error('❌ Error crítico: Faltan usuarios indispensables en la base de datos (Jesus, Jose o Takahiro).');
+            $this->error('❌ Error crítico: Faltan usuarios indispensables en la base de datos o sus cuentas están inactivas (Jesus, Jose o Takahiro).');
             return Command::FAILURE;
         }
 
@@ -57,8 +57,9 @@ class MigrarDocumentosMasivo extends Command
             $nombreArchivoCompleto = basename($rutaArchivo);
 
             // Ignorar archivos ocultos o de sistema (.gitignore, Thumbs.db, etc.)
-            if (str_starts_with($nombreArchivoCompleto, '.'))
+            if (str_starts_with($nombreArchivoCompleto, '.')) {
                 continue;
+            }
 
             $filename = pathinfo($nombreArchivoCompleto, PATHINFO_FILENAME);
             $extension = strtolower(pathinfo($nombreArchivoCompleto, PATHINFO_EXTENSION));
@@ -101,6 +102,7 @@ class MigrarDocumentosMasivo extends Command
             // Sanitizar nombre físico final para evitar caracteres extraños en el File System
             $cleanCode = strtolower(str_replace(['(', ')', '-'], '_', $documento->code));
             $hashUnico = bin2hex(random_bytes(4));
+
             // Mantiene la extensión original (.pdf, .docx, o .xlsx) del archivo cargado
             $nombreFisicoStorage = "{$cleanCode}_v{$versionNumero}_{$hashUnico}.{$extension}";
 
@@ -120,8 +122,8 @@ class MigrarDocumentosMasivo extends Command
                 'version_number' => $versionNumero,
                 'status' => 'aprobado',
                 'change_description' => $descripcion,
-                'file_path' => $rutaDestinoFinal,
-                'file_name' => $nombreArchivoCompleto, // Guarda el nombre original explicativo para la UI
+                'file_path' => $rutaDestinoFinal,       // Guarda: documentos-docflow/f_adm_18_v1_a995b9d0.xlsx
+                'file_name' => $nombreFisicoStorage,    // 🟢 CORREGIDO: Guarda el nombre real en storage con su hash y extensión exacta
                 'approved_at' => $fechaFija,
 
                 // Mapeo RACI explícito fijado al mismo segundo exacto
@@ -145,7 +147,7 @@ class MigrarDocumentosMasivo extends Command
                 'updated_at' => $fechaFija,
             ]);
 
-            $this->line("✅ Mapeado y guardado: {$documento->code} (Rev. {$versionNumero}) [Format: .{$extension}]");
+            $this->line("✅ Mapeado y guardado: {$documento->code} (Rev. {$versionNumero}) [Format: .{$extension}] -> {$nombreFisicoStorage}");
             $procesados++;
         }
 

@@ -30,13 +30,12 @@ class DocumentsTable
                 TextColumn::make('latestVersion.version_number')
                     ->label('Última Versión')
                     ->formatStateUsing(
-                        fn($state) =>
-                        $state
+                        fn($state) => !is_null($state) && $state !== ''
                         ? "Rev. {$state}"
                         : 'Sin Versión'
                     )
                     ->badge()
-                    ->color(fn () => 'warning')
+                    ->color(fn() => 'warning')
                     ->alignCenter(),
 
                 TextColumn::make('type')

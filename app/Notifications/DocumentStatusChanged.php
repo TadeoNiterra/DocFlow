@@ -23,6 +23,9 @@ class DocumentStatusChanged extends Notification implements ShouldQueue
 
     public function via($notifiable): array
     {
+        if (isset($notifiable->is_active) && !$notifiable->is_active) {
+            return [];
+        }
         return ['mail'];
     }
 
@@ -33,7 +36,7 @@ class DocumentStatusChanged extends Notification implements ShouldQueue
 
         // 🔍 Evaluamos dinámicamente el remitente según el tipo de documento aquí mismo
         $tipoDocumento = $this->version->document?->type;
-        
+
 
         return (new MailMessage)
             ->mailer('smtp') // 🔥 CONFIGURACIÓN CORRECTA: Aquí es donde pertenece el método mailer

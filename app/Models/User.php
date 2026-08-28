@@ -55,10 +55,29 @@ class User extends Authenticatable implements HasName
     }
 
     /**
+     * 🟢 BARRERA GLOBAL DE SEGURIDAD PARA NOTIFICACIONES POR CORREO
+     * Si el usuario está inactivo, este método retorna NULL y Laravel aborta el envío
+     * de cualquier notificación o correo dirigido a este usuario.
+     */
+    public function routeNotificationForMail(Notification $notification): ?string
+    {
+        if (! $this->is_active) {
+            return null;
+        }
+
+        return $this->email;
+    }
+
+    /**
      * ENVÍO SEGURO Y DIRECTO EN ESPAÑOL PARA FILAMENT
      */
     public function sendPasswordResetNotification($token): void
     {
+        // 🟢 VALIDACIÓN DENTRO DEL CÓDIGO: Si el usuario está inactivo, aborta la ejecución
+        if (! $this->is_active) {
+            return;
+        }
+
         // 1. Construimos la URL exacta de recuperación que pide Laravel/Filament
         $url = url(route('password.reset', [
             'token' => $token,
@@ -78,22 +97,27 @@ class User extends Authenticatable implements HasName
         // 3. Encapsulamos el mensaje en una notificación en caliente para evitar problemas de caché
         $this->notify(
             new class ($mailMessage) extends Notification {
-            private MailMessage $message;
+                private MailMessage $message;
 
-            public function __construct(MailMessage $message)
-            {
-                $this->message = $message;
-            }
+                public function __construct(MailMessage $message)
+                {
+                    $this->message = $message;
+                }
 
-            public function via(object $notifiable): array
-            {
-                return ['mail'];
-            }
+                public function via(object $notifiable): array
+                {
+                    // Segunda barrera de seguridad si el objeto notifiable está inactivo
+                    if (isset($notifiable->is_active) && ! $notifiable->is_active) {
+                        return [];
+                    }
 
-            public function toMail(object $notifiable): MailMessage
-            {
-                return $this->message;
-            }
+                    return ['mail'];
+                }
+
+                public function toMail(object $notifiable): MailMessage
+                {
+                    return $this->message;
+                }
             }
         );
     }

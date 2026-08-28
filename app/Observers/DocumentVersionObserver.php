@@ -62,28 +62,31 @@ class DocumentVersionObserver
             // Rescatamos el comentario del historial (limpiando etiquetas HTML si las hay)
             $comentario = strip_tags($documentVersion->change_description);
 
-            // 🧪 Tu correo único de pruebas
-            $correosDestino = 'correo_de_pruebas@tuempresa.com';
-
             /*
             |--------------------------------------------------------------------------
-            | 1. ENVÍO DEL CORREO ELECTRÓNICO (Segundo Plano)
+            | 🟢 1. OBTENER ÚNICAMENTE USUARIOS ACTIVOS DE LA MATRIZ RACI
             |--------------------------------------------------------------------------
             */
-            LaravelNotification::route('mail', $correosDestino)
-                ->notify(new DocumentStatusChanged($documentVersion, $oldStatus, $comentario));
-
-            /*
-            |--------------------------------------------------------------------------
-            | 2. ENVÍO A LA CAMPANITA DE FILAMENT (Base de Datos)
-            |--------------------------------------------------------------------------
-            */
-            // Buscamos a todos los usuarios de la matriz RACI activos en la BD
             $usersToNotify = User::query()
                 ->whereIn('default_raci_type', ['R', 'A', 'C', 'I'])
+                ->where('is_active', true) // 🔒 FILTRO DE SEGURIDAD: Solo usuarios activos
                 ->get();
 
-            // Recorremos a cada usuario para encenderle el contador rojo de su campanita en /dashboard
+            /*
+            |--------------------------------------------------------------------------
+            | 🟢 2. ENVÍO DEL CORREO ELECTRÓNICO A USUARIOS ACTIVOS
+            |--------------------------------------------------------------------------
+            */
+            if ($usersToNotify->isNotEmpty()) {
+                LaravelNotification::send($usersToNotify, new DocumentStatusChanged($documentVersion, $oldStatus, $comentario));
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | 3. ENVÍO A LA CAMPANITA DE FILAMENT (Base de Datos)
+            |--------------------------------------------------------------------------
+            */
+            // Recorremos a cada usuario activo para encenderle el contador rojo de su campanita en /dashboard
             foreach ($usersToNotify as $user) {
 
                 FilamentNotification::make()
