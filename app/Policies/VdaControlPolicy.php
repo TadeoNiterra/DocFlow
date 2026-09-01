@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\VdaControl;
 use Illuminate\Auth\Access\Response;
 
-class VdaControlPolicy
+class VdaControlPolicy 
 {
     /**
      * Determine whether the user can view any models.
