@@ -52,18 +52,31 @@ class DocumentVersionActions
                     ->color(fn() => auth()->user()?->default_raci_type === 'A' ? 'success' : 'warning')
                     ->visible(fn() => auth()->user()?->default_raci_type !== 'I')
                     ->form(function () {
-                        if (auth()->user()?->default_raci_type === 'A') {
+                        $user = auth()->user();
+
+                        // 🟢 Si es Autoridad (CISO / Aprobador), pide confirmación de contraseña
+                        if ($user?->default_raci_type === 'A') {
                             return [
                                 \Filament\Forms\Components\Placeholder::make('info_masiva')
                                     ->label('🔒 Proceso de Firma Electrónica Masiva')
-                                    ->content('Al confirmar, estamparás tu firma digital inmutable.'),
+                                    ->content('Al confirmar, estamparás tu firma digital inmutable con la nota estándar: "Se aprueban los cambios y se firman para su publicación".'),
                                 \Filament\Forms\Components\TextInput::make('password_confirmation')
-                                    ->label('Confirma tu Contraseña Institucional')->password()->required()->rules(['current_password']),
+                                    ->label('Confirma tu Contraseña Institucional')
+                                    ->password()
+                                    ->required()
+                                    ->rules(['current_password']),
                             ];
                         }
-                        return [];
+
+                        // 🟢 Para los demás roles ('R' o 'C'), el comentario es OBLIGATORIO
+                        return [
+                            \Filament\Forms\Components\Textarea::make('comment')
+                                ->label('Comentario / Justificación de Avance Masivo')
+                                ->rows(3)
+                                ->required(),
+                        ];
                     })
-                    ->action(fn(Collection $records) => self::executeMassWorkflow($records)),
+                    ->action(fn(Collection $records, array $data) => self::executeMassWorkflow($records, $data)),
                 DeleteBulkAction::make(),
             ]),
         ];
@@ -163,7 +176,7 @@ class DocumentVersionActions
     private static function shouldShowWorkflowAction($record): bool
     {
         $user = auth()->user();
-        if (!$user || !$user->is_active || $user->default_raci_type === 'I') // 🟢 Barrera: Usuario inactivo no opera el flujo
+        if (!$user || !$user->is_active || $user->default_raci_type === 'I')
             return false;
 
         return ($user->default_raci_type === 'R' && $record->status === 'draft') ||
@@ -190,16 +203,14 @@ class DocumentVersionActions
             ]);
             $record->update(['status' => 'aprobado', 'change_description' => $record->change_description . ($nuevoComentario ?: "<br><small>[{$timestamp}]</small> Documento firmado por CISO.")]);
 
-            // 🟢 Notificar solo a usuarios activos con rol RACI 'I' (Informados) o Creador
             self::notifyActiveUsersByRaci(['I'], 'Documento Aprobado', "El documento '{$record->document?->name}' fue aprobado y firmado.");
         } else {
             $record->update(['status' => $data['status'], 'change_description' => $record->change_description . $nuevoComentario]);
 
-            // 🟢 Notificar según el siguiente paso solo a usuarios activos del rol destinatario
             $targetRaci = match ($data['status']) {
-                'terminado' => 'C', // Notificar a los Consultados (Revisores)
-                'revisado' => 'A', // Notificar a la Autoridad (CISO)
-                'draft' => 'R', // Notificar al Responsable (Creador) en caso de Rechazo
+                'terminado' => 'C',
+                'revisado' => 'A',
+                'draft' => 'R',
                 default => null
             };
 
@@ -210,16 +221,35 @@ class DocumentVersionActions
         Notification::make()->title('Flujo actualizado')->success()->send();
     }
 
-    private static function executeMassWorkflow(Collection $records): void
+    private static function executeMassWorkflow(Collection $records, array $data = []): void
     {
         $user = auth()->user();
+        $timestamp = now()->format('d/m/Y H:i');
         $contador = 0;
+
+        // 🟢 DEFINICIÓN DEL COMENTARIO SEGÚN ROL RACI:
+        // Si el rol es 'A' (Autoridad/CISO), aplica la nota fija genérica de aprobación.
+        // Para los demás ('R' o 'C'), toma el comentario ingresado en el modal.
+        if ($user->default_raci_type === 'A') {
+            $textoComentario = "Se aprueban los cambios y se firman para su publicación";
+        } else {
+            $textoComentario = !empty($data['comment']) ? e($data['comment']) : "Procesamiento masivo";
+        }
+
+        $nuevoComentarioHistorial = "<br><small>[{$timestamp}] {$user->name}:</small> " . $textoComentario;
+
         foreach ($records as $record) {
             if ($user->default_raci_type === 'R' && $record->status === 'draft') {
-                $record->update(['status' => 'terminado']);
+                $record->update([
+                    'status' => 'terminado',
+                    'change_description' => $record->change_description . $nuevoComentarioHistorial
+                ]);
                 $contador++;
             } elseif ($user->default_raci_type === 'C' && $record->status === 'terminado') {
-                $record->update(['status' => 'revisado']);
+                $record->update([
+                    'status' => 'revisado',
+                    'change_description' => $record->change_description . $nuevoComentarioHistorial
+                ]);
                 $contador++;
             } elseif ($user->default_raci_type === 'A' && $record->status === 'revisado') {
                 $hash = hash('sha256', $record->id . '|' . $record->file_path . '|' . $user->email . '|' . now()->toIso8601String());
@@ -232,7 +262,10 @@ class DocumentVersionActions
                     'signature_hash' => $hash,
                     'signed_at' => now(),
                 ]);
-                $record->update(['status' => 'aprobado']);
+                $record->update([
+                    'status' => 'aprobado',
+                    'change_description' => $record->change_description . $nuevoComentarioHistorial
+                ]);
                 $contador++;
             }
         }
@@ -240,26 +273,25 @@ class DocumentVersionActions
         if ($contador > 0) {
             Notification::make()->title('Lote Procesado')->body("{$contador} registros actualizados.")->success()->send();
 
-            // 🟢 Notificar el procesamiento masivo sólo a usuarios activos
             $targetRaci = match ($user->default_raci_type) {
                 'R' => ['C'],
                 'C' => ['A'],
                 'A' => ['I', 'R'],
                 default => []
             };
-            self::notifyActiveUsersByRaci($targetRaci, 'Procesamiento Masivo de Documentos', "Se actualizaron masivamente {$contador} documentos en el sistema.");
+
+            // 🟢 Notificación general especificando el comentario aplicado
+            $cuerpoNotificacion = "Se actualizaron masivamente {$contador} documentos. Nota: {$textoComentario}";
+            self::notifyActiveUsersByRaci($targetRaci, 'Procesamiento Masivo de Documentos', $cuerpoNotificacion);
         } else {
             Notification::make()->title('Sin cambios')->warning()->send();
         }
     }
 
-    /**
-     * 🟢 MÉTODOS PRIVADOS AUXILIARES: Garantiza el envío de notificaciones ÚNICAMENTE a usuarios activos.
-     */
     private static function notifyActiveUsersByRaci(array $raciRoles, string $title, string $body): void
     {
         $usuariosActivos = User::whereIn('default_raci_type', $raciRoles)
-            ->where('is_active', true) // 🔒 Doble candado: Solo usuarios con cuenta activa
+            ->where('is_active', true)
             ->get();
 
         foreach ($usuariosActivos as $usuario) {
@@ -267,7 +299,7 @@ class DocumentVersionActions
                 ->title($title)
                 ->body($body)
                 ->info()
-                ->sendToDatabase($usuario); // O enviar por Mail si tu clase usa per-mail
+                ->sendToDatabase($usuario);
         }
     }
 }
