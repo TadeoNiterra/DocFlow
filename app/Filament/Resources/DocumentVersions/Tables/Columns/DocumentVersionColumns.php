@@ -17,6 +17,11 @@ class DocumentVersionColumns
 
             TextColumn::make('version_number')
                 ->label('Versión')
+                ->formatStateUsing(
+                    fn($state) => !is_null($state) && $state !== ''
+                    ? "Rev. {$state}"
+                    : 'Sin Versión'
+                )
                 ->badge()
                 ->color('warning')
                 ->sortable(),
@@ -44,13 +49,20 @@ class DocumentVersionColumns
 
             TextColumn::make('reviewed_at')->label('Fecha de Revisión')->dateTime('d/m/Y H:i')->toggleable(isToggledHiddenByDefault: true),
             TextColumn::make('last_reviewed_at')->label('Última Revisión')->dateTime('d/m/Y H:i')->sortable(),
-            TextColumn::make('proxima_revision')->label('Próxima Revisión')->badge()->color(fn($record) => $record->last_reviewed_at ? 'info' : 'gray')->state(function ($record) {
-                    if (empty($record->last_reviewed_at)) {
-                        return 'Pendiente';
-                    }
-                    return Carbon::parse($record->last_reviewed_at)
+            TextColumn::make('proxima_revision')
+                ->label('Próxima Revisión')
+                ->badge()
+                ->color('info')
+                ->state(function ($record) {
+                    $baseDate = $record->last_reviewed_at
+                        ? Carbon::parse($record->last_reviewed_at)
+                        : now();
+
+                    return $baseDate
                         ->addYear()
-                        ->format('d/m/Y H:i');
+                        ->month(7)
+                        ->day(1)
+                        ->format('d/m/Y');
                 }),
             TextColumn::make('approved_at')->label('Fecha de Aprobación')->dateTime('d/m/Y H:i')
                 ->description(fn($record) => $record->approved_at ? '🔒 Validación TISAX' : null)->sortable(),
