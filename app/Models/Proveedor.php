@@ -31,4 +31,8 @@ class Proveedor extends Model
     {
         return $this->hasMany(EvidenciaProveedor::class, 'proveedor_id');
     }
+    public function evaluacionesIt22(): HasMany
+    {
+        return $this->hasMany(FormatoIt22Evaluation::class, 'proveedor_id');
+    }
 }

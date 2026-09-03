@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PdfReportController;
+use App\Http\Controllers\SupplierEvaluationPdfController;
 use App\Models\FormatoIt09Evidencia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -8,7 +9,7 @@ use App\Models\Proveedor;
 use Illuminate\Support\Str;
 
 Route::middleware(['web', 'auth'])->group(function () {
-    
+
     // 📦 DESCARGA DE EXPEDIENTE COMPLETO EN ZIP
     Route::get('/proveedores/{proveedor}/descargar-expediente', function (Proveedor $proveedor) {
         $slug = Str::slug($proveedor->nombre);
@@ -23,7 +24,7 @@ Route::middleware(['web', 'auth'])->group(function () {
         $zipPath = storage_path("app/private/temp_{$zipFileName}");
 
         // 👈 Usamos \ZipArchive directamente
-        $zip = new \ZipArchive(); 
+        $zip = new \ZipArchive();
         if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
             $files = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($folderPath),
@@ -56,7 +57,7 @@ Route::middleware(['web', 'auth'])->prefix('formatos')->group(function () {
     Route::get('/f-it-09/{record}/preview', [PdfReportController::class, 'formatoIt09'])->name('formato-it09.preview-pdf');
     Route::get('/f-it-11/{record}/preview', [PdfReportController::class, 'formatoIt11'])->name('formato-it11.preview-pdf');
     Route::get('/f-it-18/{record}/preview', [PdfReportController::class, 'formatoIt18'])->name('formato-it18.preview-pdf');
-
+    Route::get('/f-it-22/{record}/preview', [SupplierEvaluationPdfController::class, 'download'])->name('evaluaciones-proveedor.pdf');
     // Descargas de evidencias
     Route::get('/f-it-09/evidencia/{evidencia}', function (FormatoIt09Evidencia $evidencia) {
         $disk = Storage::disk('local');
