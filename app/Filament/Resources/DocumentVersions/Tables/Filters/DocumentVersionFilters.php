@@ -23,21 +23,18 @@ class DocumentVersionFilters
     public static function makeGroups(): array
     {
         return [
-            Group::make('is_latest_group')
+            // 🟢 Usamos un nombre de columna string puro en Group::make()
+            Group::make('id')
                 ->label('Estado de Vigencia')
                 ->collapsible()
-                // 🟢 1. Ordena la consulta SQL para agrupar primero las versiones vigentes y luego las anteriores
                 ->orderQueryUsing(function (Builder $query, string $direction) {
-                    return $query
-                        ->join('documents', 'document_versions.document_id', '=', 'documents.id')
-                        ->select('document_versions.*')
-                        ->orderByRaw("(CASE WHEN document_versions.id = (
-                        SELECT max(dv.id) 
-                        from document_versions dv 
-                        where dv.document_id = document_versions.document_id
+                    // Ordenamos en SQL Server calculando si el id de la versión es el máximo registrado para ese documento
+                    return $query->orderByRaw("(CASE WHEN document_versions.id = (
+                        SELECT MAX(dv.id) 
+                        FROM document_versions dv 
+                        WHERE dv.document_id = document_versions.document_id
                     ) THEN 1 ELSE 2 END) {$direction}");
                 })
-                // 🟢 2. Asigna la etiqueta visual correspondiente a los 2 únicos bloques
                 ->getTitleFromRecordUsing(function ($record): string {
                     $latestVersionId = $record->document?->latestVersion?->id;
 
@@ -54,7 +51,7 @@ class DocumentVersionFilters
                     'terminado' => '🔍 En revisión por Auditor (Terminado)',
                     'revisado' => '🟣 Aceptado por Auditor (Revisado)',
                     'aprobado' => '🔒 Firmado y Publicado (Aprobado)',
-                    default => ucfirst($record->status),
+                    default => ucfirst($record->status ?? 'Desconocido'),
                 }),
 
             Group::make('document.name')
