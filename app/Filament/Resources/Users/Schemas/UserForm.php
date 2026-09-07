@@ -31,6 +31,7 @@ class UserForm
                     ->options([
                         'Usuario' => 'Usuario',
                         'Administrador' => 'Administrador',
+                        'Testing' => 'Testing',
                     ])
                     ->required(),
                 Toggle::make('is_active')

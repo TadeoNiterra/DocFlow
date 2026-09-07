@@ -17,7 +17,7 @@ class DocumentVersionHeaderActions
     {
         return [
             ActionGroup::make([
-                // 🟢 1. EXPORTAR A CSV
+                //  1. EXPORTAR A CSV
                 Action::make('exportCsv')
                     ->label('Exportar Evidencia (CSV)')
                     ->icon(Heroicon::OutlinedDocumentText)
@@ -37,7 +37,7 @@ class DocumentVersionHeaderActions
                         return self::downloadCsv($data['vigencia']);
                     }),
 
-                // 🟢 2. EXPORTAR A PDF
+                //  2. EXPORTAR A PDF
                 Action::make('exportPdf')
                     ->label('Exportar Reporte (PDF)')
                     ->icon(Heroicon::OutlinedDocumentArrowDown)
@@ -117,8 +117,8 @@ class DocumentVersionHeaderActions
                     $row->status,
                     $row->file_name ?? $row->file_path,
                     $row->user?->name ?? 'N/A',
-                    $row->created_at ? Carbon::parse($row->created_at)->format('d/m/Y') : 'N/A', // 🟢 Formato DD/MM/AAAA
-                    $proximaRevision, // 🟢 01/07/{año_proximo}
+                    $row->created_at ? Carbon::parse($row->created_at)->format('d/m/Y') : 'N/A', //  Formato DD/MM/AAAA
+                    $proximaRevision, //  01/07/{año_proximo}
                     $esVigente ? 'Vigente (Última Versión)' : 'Histórico (Anterior)',
                 ]);
             }

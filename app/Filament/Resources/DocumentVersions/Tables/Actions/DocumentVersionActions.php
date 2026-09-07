@@ -54,7 +54,7 @@ class DocumentVersionActions
                     ->form(function () {
                         $user = auth()->user();
 
-                        // 🟢 Si es Autoridad (CISO / Aprobador), pide confirmación de contraseña
+                        //  Si es Autoridad (CISO / Aprobador), pide confirmación de contraseña
                         if ($user?->default_raci_type === 'A') {
                             return [
                                 \Filament\Forms\Components\Placeholder::make('info_masiva')
@@ -68,7 +68,7 @@ class DocumentVersionActions
                             ];
                         }
 
-                        // 🟢 Para los demás roles ('R' o 'C'), el comentario es OBLIGATORIO
+                        //  Para los demás roles ('R' o 'C'), el comentario es OBLIGATORIO
                         return [
                             \Filament\Forms\Components\Textarea::make('comment')
                                 ->label('Comentario / Justificación de Avance Masivo')
@@ -227,7 +227,7 @@ class DocumentVersionActions
         $timestamp = now()->format('d/m/Y H:i');
         $contador = 0;
 
-        // 🟢 DEFINICIÓN DEL COMENTARIO SEGÚN ROL RACI:
+        //  DEFINICIÓN DEL COMENTARIO SEGÚN ROL RACI:
         // Si el rol es 'A' (Autoridad/CISO), aplica la nota fija genérica de aprobación.
         // Para los demás ('R' o 'C'), toma el comentario ingresado en el modal.
         if ($user->default_raci_type === 'A') {
@@ -280,7 +280,7 @@ class DocumentVersionActions
                 default => []
             };
 
-            // 🟢 Notificación general especificando el comentario aplicado
+            //  Notificación general especificando el comentario aplicado
             $cuerpoNotificacion = "Se actualizaron masivamente {$contador} documentos. Nota: {$textoComentario}";
             self::notifyActiveUsersByRaci($targetRaci, 'Procesamiento Masivo de Documentos', $cuerpoNotificacion);
         } else {
