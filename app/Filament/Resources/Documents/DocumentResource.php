@@ -13,12 +13,13 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class DocumentResource extends Resource
 {
     protected static ?string $model = Document::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::FolderOpen;
+    protected static UnitEnum|string|null $navigationGroup = 'Control de Documentos';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentText;
 
     protected static ?string $recordTitleAttribute = 'Document';
 

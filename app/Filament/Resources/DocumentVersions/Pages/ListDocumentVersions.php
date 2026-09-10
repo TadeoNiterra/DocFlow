@@ -15,12 +15,10 @@ class ListDocumentVersions extends ListRecords
     {
         return array_merge(
             [
-                // 🟢 Se define explícitamente el botón de creación
                 CreateAction::make()
                     ->label('Crear Nueva Versión')
                     ->icon('heroicon-o-plus'),
             ],
-            // 🟢 Se anexan los botones de exportación CSV / PDF
             DocumentVersionHeaderActions::make()
         );
     }

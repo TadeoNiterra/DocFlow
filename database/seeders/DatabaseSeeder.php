@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             FormatoIt02Seeder::class,
             ProveedorSeeder::class,
             DocumentVersionSeeder::class,
+            SoftwareListSeeder::class,
         ]);
     }
 }

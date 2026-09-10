@@ -83,8 +83,16 @@ class DashboardPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 NavigationGroup::make()
+                    ->label('Control de Documentos')
+                    ->icon('heroicon-o-arrow-path-rounded-square')
+                    ->collapsible(true),
+                NavigationGroup::make()
+                    ->label('Inventarios')
+                    ->icon('heroicon-o-building-storefront')
+                    ->collapsible(true),
+                NavigationGroup::make()
                     ->label('Formatos SGSI')
-                    ->icon('heroicon-o-folder-open')
+                    ->icon('heroicon-o-inbox-arrow-down')
                     ->collapsible(true),
                 NavigationGroup::make()
                     ->label('F-IT-02 Matriz Derechos')

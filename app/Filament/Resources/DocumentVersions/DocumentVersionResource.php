@@ -13,16 +13,15 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 use Illuminate\Database\Eloquent\Builder;
 
 class DocumentVersionResource extends Resource
 {
     protected static ?string $model = DocumentVersion::class;
 
-    // Cambia estas dos propiedades estáticas dentro de tu DocumentVersionResource:
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentArrowUp;
-
+    protected static UnitEnum|string|null $navigationGroup = 'Control de Documentos';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentText;
     public static function getPluralModelLabel(): string
     {
         return 'Historial de Versiones';
