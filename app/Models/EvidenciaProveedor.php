@@ -14,6 +14,7 @@ class EvidenciaProveedor extends Model
     
     protected $fillable = [
         'proveedor_id',
+        'categoria',
         'ruta_archivo',
         'nombre_archivo',
     ];

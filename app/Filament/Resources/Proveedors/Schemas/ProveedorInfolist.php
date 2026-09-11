@@ -31,11 +31,11 @@ class ProveedorInfolist
                         TextEntry::make('status')
                             ->label('Estatus del Proveedor')
                             ->badge()
-                            ->color(fn (string $state): string => match ($state) {
+                            ->color(fn(string $state): string => match ($state) {
                                 'Activo' => 'success',
-                                'Baja'   => 'danger',
+                                'Baja' => 'danger',
                                 'Evento' => 'warning',
-                                default  => 'gray',
+                                default => 'gray',
                             }),
 
                         TextEntry::make('departamentoResponsable')
@@ -65,6 +65,38 @@ class ProveedorInfolist
                     ->columns(3)
                     ->columnSpanFull(),
 
+                Section::make('Ubicación y Domicilio Fiscal')
+                    ->icon('heroicon-o-map-pin')
+                    ->schema([
+                        TextEntry::make('domicilio')
+                            ->label('Calle y Número')
+                            ->placeholder('No registrado'),
+
+                        TextEntry::make('colonia')
+                            ->label('Colonia')
+                            ->placeholder('No registrada'),
+
+                        TextEntry::make('municipio')
+                            ->label('Municipio / Alcaldía')
+                            ->placeholder('No registrado'),
+
+                        TextEntry::make('ciudad')
+                            ->label('Ciudad')
+                            ->placeholder('No registrada'),
+
+                        TextEntry::make('cp')
+                            ->label('Código Postal')
+                            ->badge()
+                            ->color('gray')
+                            ->placeholder('N/A'),
+
+                        TextEntry::make('pais')
+                            ->label('País')
+                            ->placeholder('México'),
+                    ])
+                    ->columns(3)
+                    ->columnSpanFull(),
+
                 // SECCIÓN 3: EXPEDIENTE CON BOTÓN ZIP EN EL HEADER
                 Section::make('Expediente Digital / Evidencias')
                     ->headerActions([
@@ -73,7 +105,7 @@ class ProveedorInfolist
                             ->icon('heroicon-o-archive-box')
                             ->color('success')
                             ->size('sm')
-                            ->url(fn ($record) => route('proveedores.descargar-expediente', $record))
+                            ->url(fn($record) => route('proveedores.descargar-expediente', $record))
                             ->openUrlInNewTab(),
                     ])
                     ->schema([
@@ -87,8 +119,8 @@ class ProveedorInfolist
 
                                 TextEntry::make('ruta_archivo')
                                     ->label('Archivo Adjunto')
-                                    ->formatStateUsing(fn ($state) => '📄 Ver Documento PDF')
-                                    ->url(fn ($record) => $record?->ruta_archivo ? asset('storage/' . $record->ruta_archivo) : null)
+                                    ->formatStateUsing(fn($state) => '📄 Ver Documento PDF')
+                                    ->url(fn($record) => $record?->ruta_archivo ? asset('storage/' . $record->ruta_archivo) : null)
                                     ->openUrlInNewTab()
                                     ->color('primary')
                                     ->columnSpan(1),

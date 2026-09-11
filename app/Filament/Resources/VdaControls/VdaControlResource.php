@@ -13,13 +13,16 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class VdaControlResource extends Resource
 {
     protected static ?string $model = VdaControl::class;
 
     // 🚀 Icono oficial de escudo/cumplimiento normativo
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::ShieldCheck;
+    protected static UnitEnum|string|null $navigationGroup = 'Control de Documentos';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentText;
+
 
     protected static ?string $navigationLabel = 'Estructura VDA / TISAX';
     protected static ?string $modelLabel = 'Control VDA';

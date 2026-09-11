@@ -22,6 +22,12 @@ class Proveedor extends Model
         'numeroContacto',
         'email',
         'date',
+        'domicilio',
+        'colonia',
+        'municipio',
+        'ciudad',
+        'cp',
+        'pais',
     ];
     protected $casts = [
         'date' => 'integer',

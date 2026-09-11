@@ -7,6 +7,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -62,8 +63,8 @@ class ProveedorForm
                             ->searchable()
                             ->required(),
                     ])
-                    ->columns(3) // 👈 3 Columnas internas
-                    ->columnSpanFull(), // 👈 Ocupa todo el ancho disponible
+                    ->columns(3) //  3 Columnas internas
+                    ->columnSpanFull(), //  Ocupa todo el ancho disponible
 
                 // SECCIÓN 2: CONTACTO (3 COLUMNAS)
                 Section::make('Datos de contacto del Proveedor')
@@ -83,63 +84,133 @@ class ProveedorForm
                             ->label('Correo Electrónico')
                             ->placeholder('Ej. juan.perez@empresa.com'),
                     ])
-                    ->columns(3) // 👈 3 Columnas internas
-                    ->columnSpanFull(), // 👈 Ocupa todo el ancho disponible
+                    ->columns(3) //  3 Columnas internas
+                    ->columnSpanFull(), //  Ocupa todo el ancho disponible
 
+                Section::make('Ubicación y Domicilio Fiscal')
+                    ->description('Dirección geografía y datos de localización del proveedor')
+                    ->icon('heroicon-o-map-pin')
+                    ->schema([
+                        TextInput::make('domicilio')
+                            ->label('Calle y Número (Domicilio)')
+                            ->maxLength(255),
+
+                        TextInput::make('colonia')
+                            ->label('Colonia')
+                            ->maxLength(255),
+
+                        TextInput::make('municipio')
+                            ->label('Municipio / Alcaldía')
+                            ->maxLength(255),
+
+                        TextInput::make('ciudad')
+                            ->label('Ciudad')
+                            ->maxLength(255),
+
+                        TextInput::make('cp')
+                            ->label('Código Postal')
+                            ->numeric()
+                            ->length(5),
+
+                        TextInput::make('pais')
+                            ->label('País')
+                            ->default('México')
+                            ->maxLength(255),
+                    ])
+                    ->columns(3) //  3 Columnas internas
+                    ->columnSpanFull(), //  Ocupa todo el ancho disponible
                 // SECCIÓN 3: EXPEDIENTE
                 Section::make('Expediente / Evidencias del Proveedor')
                     ->schema([
                         Repeater::make('evidencias')
                             ->relationship('evidencias')
                             ->schema([
+                                // 1. Selección de Categoría Principal
+                                Select::make('categoria')
+                                    ->label('Categoría del Documento')
+                                    ->options([
+                                        'legales' => '⚖️ Documentos Legales',
+                                        'educacion' => '🎓 Educación y Capacitación',
+                                        'servicio' => '⚙️ Servicios y Niveles (SLA/SOC)',
+                                        'otros' => '📁 Otros Documentos',
+                                    ])
+                                    ->live()
+                                    ->required()
+                                    ->columnSpan(1),
+
+                                // 2. Tipo de Documento según la Categoría
                                 Select::make('nombre_archivo')
                                     ->label('Tipo de Documento')
-                                    ->options([
-                                        'Acta Constitutiva' => 'Acta Constitutiva',
-                                        'Comprobante de Domicilio' => 'Comprobante de Domicilio',
-                                        'Constancia de Situación Fiscal' => 'Constancia de Situación Fiscal (CSF)',
-                                        'Opinión de Cumplimiento' => 'Opinión de Cumplimiento (SAT)',
-                                        'Caratula Bancaria' => 'Carátula Bancaria',
-                                        'Contrato de Servicios' => 'Contrato de Servicios',
-                                        'NDA / Acuerdo de Confidencialidad' => 'NDA / Acuerdo de Confidencialidad',
-                                        'Otro' => 'Otro Documento',
-                                    ])
+                                    ->options(function (Get $get) {
+                                        return match ($get('categoria')) {
+                                            'legales' => [
+                                                'Acta Constitutiva' => 'Acta Constitutiva',
+                                                'Comprobante de Domicilio' => 'Comprobante de Domicilio',
+                                                'Constancia de Situacion Fiscal' => 'Constancia de Situación Fiscal (CSF)',
+                                                'Opinion de Cumplimiento' => 'Opinión de Cumplimiento (SAT)',
+                                                'Caratula Bancaria' => 'Carátula Bancaria',
+                                                'Contrato de Servicios' => 'Contrato de Servicios',
+                                                'NDA / Acuerdo de Confidencialidad' => 'NDA / Acuerdo de Confidencialidad',
+                                            ],
+                                            'educacion' => [
+                                                'Memoria Tecnica' => 'Memoria Técnica',
+                                                'Certificaciones' => 'Certificaciones de Personal / Empresa',
+                                                'Cursos y Capacitacion' => 'Cursos y Capacitación',
+                                                'Constancia Laboral / DC3' => 'Constancias / DC-3',
+                                            ],
+                                            'servicio' => [
+                                                'SLA / Niveles de Servicio' => 'Acuerdo de Nivel de Servicio (SLA)',
+                                                'Reporte SOC 1 / SOC 2' => 'Reporte SOC 1 / SOC 2 / ISO',
+                                                'Matriz de Escalacion' => 'Matriz de Escalación y Soporte',
+                                                'Poliza de Soporte' => 'Póliza de Soporte',
+                                            ],
+                                            default => [
+                                                'Otro' => 'Otro Documento',
+                                            ],
+                                        };
+                                    })
                                     ->searchable()
                                     ->required()
-                                    ->columnSpan(1), // 👈 Ocupa 1 columna de las 2 del Repeater
+                                    ->columnSpan(1),
 
+                                // 3. Carga del Archivo (ACEPTA CUALQUIER FORMATO)
                                 FileUpload::make('ruta_archivo')
-                                    ->label('Archivo PDF')
+                                    ->label('Archivo / Evidencia Adjunta')
                                     ->disk('local')
-                                    ->directory(function ($get) {
+                                    // 📁 Subcarpeta dinámica: proveedores/{proveedor}/{categoria}/
+                                    ->directory(function (Get $get) {
                                         $nombreProveedor = $get('../../nombre') ?? 'general';
-                                        $slug = Str::slug($nombreProveedor);
-                                        return "proveedores/{$slug}";
+                                        $categoria = $get('categoria') ?? 'otros';
+
+                                        $slugProveedor = Str::slug($nombreProveedor);
+                                        $slugCategoria = Str::slug($categoria);
+
+                                        return "proveedores/{$slugProveedor}/{$slugCategoria}";
                                     })
-                                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get) {
-                                        // 1. Obtener Tipo de Documento y Nombre del Proveedor
+                                    // 📄 Mantiene la extensión original (.pdf, .docx, .xlsx, .zip, .png, etc.)
+                                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, Get $get) {
                                         $tipoDocumento = $get('nombre_archivo') ?? 'documento';
                                         $nombreProveedor = $get('../../nombre') ?? 'proveedor';
 
-                                        // 2. Formatear a texto limpio sin caracteres especiales o espacios
                                         $slugDocumento = Str::slug($tipoDocumento, '_');
                                         $slugProveedor = Str::slug($nombreProveedor, '_');
+
+                                        // Captura dinámicamente la extensión real del archivo subido
                                         $extension = $file->getClientOriginalExtension();
 
-                                        // 3. Resultado: TipoDocumento_NombreProveedor.pdf
                                         return "{$slugDocumento}_{$slugProveedor}.{$extension}";
                                     })
-                                    ->acceptedFileTypes(['application/pdf'])
-                                    ->maxSize(10240) // 10 MB
+                                    // 🔓 Se removió ->acceptedFileTypes() para permitir cualquier tipo de archivo
+                                    ->maxSize(20480) // Límite aumentado a 20 MB (Ajustable según tus necesidades)
                                     ->required()
-                                    ->columnSpan(1),
+                                    ->columnSpan(2),
                             ])
-                            ->columns(2) // 👈 Dentro de cada ítem del repeater mantendremos 2 columnas para equilibrar Tipo y Archivo
+                            ->columns(2)
                             ->addActionLabel(' + Agregar otra evidencia / documento')
                             ->defaultItems(0)
                             ->reorderable(false),
                     ])
-                    ->columnSpanFull(), // 👈 Ocupa todo el ancho disponible
+                    ->columnSpanFull()
             ]);
     }
 }
