@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FormatoLog01PdfController;
 use App\Http\Controllers\PdfReportController;
 use App\Http\Controllers\SupplierEvaluationPdfController;
 use App\Models\FormatoIt09Evidencia;
@@ -58,6 +59,8 @@ Route::middleware(['web', 'auth'])->prefix('formatos')->group(function () {
     Route::get('/f-it-11/{record}/preview', [PdfReportController::class, 'formatoIt11'])->name('formato-it11.preview-pdf');
     Route::get('/f-it-18/{record}/preview', [PdfReportController::class, 'formatoIt18'])->name('formato-it18.preview-pdf');
     Route::get('/f-it-22/{record}/preview', [SupplierEvaluationPdfController::class, 'download'])->name('evaluaciones-proveedor.pdf');
+    Route::get('/formato-log01/{id}/pdf', [FormatoLog01PdfController::class, 'download'])
+        ->name('formato-log01.pdf');
     // Descargas de evidencias
     Route::get('/f-it-09/evidencia/{evidencia}', function (FormatoIt09Evidencia $evidencia) {
         $disk = Storage::disk('local');
