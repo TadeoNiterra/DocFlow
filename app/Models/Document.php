@@ -21,15 +21,13 @@ class Document extends Model
 
     public function latestVersion(): HasOne
     {
-        return $this
-            ->hasOne(DocumentVersion::class)
-            ->ofMany('version_number', 'max');
+        return $this->hasOne(DocumentVersion::class)->ofMany('id', 'max');
     }
 
     protected function title(): Attribute
     {
         return Attribute::make(
-            get: fn (?string $value) => $value ?? 'Documento sin título (Revisar Código)',
+            get: fn(?string $value) => $value ?? 'Documento sin título (Revisar Código)',
         );
     }
 }

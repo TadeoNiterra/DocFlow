@@ -225,81 +225,67 @@ class DocumentVersionActions
     {
         $user = auth()->user();
         $timestamp = now()->format('d/m/Y H:i');
-        $contador = 0;
 
-        //  DEFINICIÓN DEL COMENTARIO SEGÚN ROL RACI:
-        // Si el rol es 'A' (Autoridad/CISO), aplica la nota fija genérica de aprobación.
-        // Para los demás ('R' o 'C'), toma el comentario ingresado en el modal.
-        if ($user->default_raci_type === 'A') {
-            $textoComentario = "Se aprueban los cambios y se firman para su publicación";
-        } else {
-            $textoComentario = !empty($data['comment']) ? e($data['comment']) : "Procesamiento masivo";
-        }
+        $textoComentario = match ($user?->default_raci_type) {
+            'A' => "Se aprueban los cambios y se firman para su publicación.",
+            default => !empty($data['comment']) ? e($data['comment']) : "Procesamiento masivo",
+        };
 
         $nuevoComentarioHistorial = "<br><small>[{$timestamp}] {$user->name}:</small> " . $textoComentario;
 
-        foreach ($records as $record) {
-            if ($user->default_raci_type === 'R' && $record->status === 'draft') {
-                $record->update([
-                    'status' => 'terminado',
-                    'change_description' => $record->change_description . $nuevoComentarioHistorial
-                ]);
-                $contador++;
-            } elseif ($user->default_raci_type === 'C' && $record->status === 'terminado') {
-                $record->update([
-                    'status' => 'revisado',
-                    'change_description' => $record->change_description . $nuevoComentarioHistorial
-                ]);
-                $contador++;
-            } elseif ($user->default_raci_type === 'A' && $record->status === 'revisado') {
-                $hash = hash('sha256', $record->id . '|' . $record->file_path . '|' . $user->email . '|' . now()->toIso8601String());
-                $record->signatures()->create([
-                    'user_id' => $user->id,
-                    'user_name_snapshot' => $user->name,
-                    'user_email_snapshot' => $user->email,
-                    'ip_address' => request()->ip(),
-                    'user_agent' => request()->userAgent(),
-                    'signature_hash' => $hash,
-                    'signed_at' => now(),
-                ]);
-                $record->update([
-                    'status' => 'aprobado',
-                    'change_description' => $record->change_description . $nuevoComentarioHistorial
-                ]);
-                $contador++;
+        // Garantía de integridad con transacción SQL
+        DB::transaction(function () use ($records, $user, $nuevoComentarioHistorial, &$contador) {
+            $contador = 0;
+
+            foreach ($records as $record) {
+                if ($user->default_raci_type === 'R' && $record->status === 'draft') {
+                    $record->update([
+                        'status' => 'terminado',
+                        'change_description' => $record->change_description . $nuevoComentarioHistorial
+                    ]);
+                    $contador++;
+                } elseif ($user->default_raci_type === 'C' && $record->status === 'terminado') {
+                    $record->update([
+                        'status' => 'revisado',
+                        'change_description' => $record->change_description . $nuevoComentarioHistorial
+                    ]);
+                    $contador++;
+                } elseif ($user->default_raci_type === 'A' && $record->status === 'revisado') {
+                    // Cálculo de hash combinando metadatos y el hash binario del archivo
+                    $fileHash = Storage::disk('local')->exists($record->file_path)
+                        ? hash_file('sha256', Storage::disk('local')->path($record->file_path))
+                        : 'no-file-hash';
+
+                    $hashSignature = hash('sha256', implode('|', [
+                        $record->id,
+                        $fileHash,
+                        $user->email,
+                        now()->toIso8601String()
+                    ]));
+
+                    $record->signatures()->create([
+                        'user_id' => $user->id,
+                        'user_name_snapshot' => $user->name,
+                        'user_email_snapshot' => $user->email,
+                        'ip_address' => request()->ip(),
+                        'user_agent' => request()->userAgent(),
+                        'signature_hash' => $hashSignature,
+                        'signed_at' => now(),
+                    ]);
+
+                    $record->update([
+                        'status' => 'aprobado',
+                        'change_description' => $record->change_description . $nuevoComentarioHistorial
+                    ]);
+                    $contador++;
+                }
             }
-        }
+        });
 
         if ($contador > 0) {
             Notification::make()->title('Lote Procesado')->body("{$contador} registros actualizados.")->success()->send();
-
-            $targetRaci = match ($user->default_raci_type) {
-                'R' => ['C'],
-                'C' => ['A'],
-                'A' => ['I', 'R'],
-                default => []
-            };
-
-            //  Notificación general especificando el comentario aplicado
-            $cuerpoNotificacion = "Se actualizaron masivamente {$contador} documentos. Nota: {$textoComentario}";
-            self::notifyActiveUsersByRaci($targetRaci, 'Procesamiento Masivo de Documentos', $cuerpoNotificacion);
         } else {
             Notification::make()->title('Sin cambios')->warning()->send();
-        }
-    }
-
-    private static function notifyActiveUsersByRaci(array $raciRoles, string $title, string $body): void
-    {
-        $usuariosActivos = User::whereIn('default_raci_type', $raciRoles)
-            ->where('is_active', true)
-            ->get();
-
-        foreach ($usuariosActivos as $usuario) {
-            Notification::make()
-                ->title($title)
-                ->body($body)
-                ->info()
-                ->sendToDatabase($usuario);
         }
     }
 }
