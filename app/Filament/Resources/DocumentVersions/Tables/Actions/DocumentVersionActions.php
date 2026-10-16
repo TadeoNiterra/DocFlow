@@ -27,7 +27,8 @@ class DocumentVersionActions
             ViewAction::make()
                 ->label('Ver Detalles')
                 ->color('info')
-                ->infolist(fn($infolist) => self::buildInfolistSchema($infolist))
+                // Carga diferida del infolist solo al presionar el botón:
+                ->infolist(fn(DocumentVersion $record, $infolist) => self::buildInfolistSchema($infolist))
                 ->extraModalActions([
                     self::makeViewPdfAction(),
                     self::makeWorkflowTransitionAction(),

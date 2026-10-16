@@ -56,35 +56,37 @@ class DocumentVersionResource extends Resource
     }
     public static function getEloquentQuery(): Builder
     {
-        $query = parent::getEloquentQuery();
+        $query = parent::getEloquentQuery()
+            ->with([
+                'document',
+                'user',
+                'creator',
+                'reviewer',
+                'document.latestVersion',
+            ]);
+
         $user = auth()->user();
 
-        // Si no hay ningún usuario logueado, por seguridad solo devolvemos los aprobados
         if (!$user) {
-            return $query->where('status', 'aprobado'); // ✅ Corregido
+            return $query->where('status', 'aprobado');
         }
 
-        // [ R ] RESPONSABLE: Les aparece draft, terminado, revisado y aprobado (Todos)
         if ($user->default_raci_type === 'R') {
             return $query->whereIn('status', ['draft', 'terminado', 'revisado', 'aprobado']);
         }
 
-        // [ A ] AUTORIDAD (CISO): Les aparece revisado y aprobado
         if ($user->default_raci_type === 'A') {
             return $query->whereIn('status', ['revisado', 'aprobado']);
         }
 
-        // [ C ] CONSULTADO (Auditor): Les aparece terminado y aprobado
         if ($user->default_raci_type === 'C') {
             return $query->whereIn('status', ['terminado', 'aprobado']);
         }
 
-        // [ I ] INFORMADO: Les aparece únicamente aprobado
         if ($user->default_raci_type === 'I') {
-            return $query->where('status', 'aprobado'); // ✅ Corregido
+            return $query->where('status', 'aprobado');
         }
 
-        // Fallback de seguridad
         return $query;
     }
 }

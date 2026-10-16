@@ -12,7 +12,8 @@ class DocumentVersionsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->paginated(false)
+            ->paginated([10, 25, 50])
+            ->defaultPaginationPageOption(10)
             ->columns(DocumentVersionColumns::make())
             ->filters(DocumentVersionFilters::makeSelectFilters())
             ->groups(DocumentVersionFilters::makeGroups())
