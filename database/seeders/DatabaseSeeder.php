@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
             ProveedorSeeder::class,
             DocumentVersionSeeder::class,
             SoftwareListSeeder::class,
+            DispositivoSeeder::class,
+            ColaboradorSeeder::class,
+            ModeloEquipoSeeder::class,
         ]);
     }
 }

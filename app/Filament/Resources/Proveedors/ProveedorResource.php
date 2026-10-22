@@ -22,7 +22,7 @@ class ProveedorResource extends Resource
     protected static ?string $model = Proveedor::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventarios';
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentText;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ShoppingBag;
 
     protected static ?string $recordTitleAttribute = 'Proveedor';
     

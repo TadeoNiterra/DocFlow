@@ -5,6 +5,7 @@ use App\Models\VdaEvidence;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ResponsivaController;
 
 // Redirección raíz
 Route::redirect('/', '/dashboard');
@@ -69,3 +70,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     })->name('vda.evidence.file');
 
 });
+
+Route::get('/colaboradores/{colaborador}/responsiva', [ResponsivaController::class, 'stream'])
+    ->name('colaboradores.responsiva.pdf')
+    ->middleware(['web', 'auth']);
