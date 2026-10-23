@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Colaboradors\Schemas;
 
 use App\Models\Colaborador;
+use App\Models\Departamento;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -50,38 +51,33 @@ class ColaboradorForm
                 Section::make('Información del Colaborador')
                     ->description('Datos generales y puesto dentro de la organización')
                     ->schema([
-                        // 1. SELECT DE DEPARTAMENTO (REACTIVO)
-                        Select::make('department')
+                        // Select de Departamento dinámico
+                        Select::make('departamento_id')
                             ->label('Departamento / Área')
-                            ->options([
-                                'IT'      => 'Departamento de IT',
-                                'RH'      => 'Departamento de Recursos Humanos',
-                                'MKT'     => 'Departamento de Mercadotecnia',
-                                'SCM'     => 'Departamento de Cadena de Suministro',
-                                'ALM'     => 'Departamento de Almacén',
-                                'ADM'     => 'Departamento de Administración',
-                                'FIN'     => 'Departamento de Finanzas',
-                                'IAM'     => 'Departamento de Ventas',
-                                'CONT'    => 'Departamento de Contabilidad',
-                                'OEM'     => 'Departamento de OEM',
-                                'MKS'     => 'Departamento de Mercadotecnia Servicio',
-                                'BI'      => 'Departamento de Inteligencia de Negocios',
-                                'IAM_EXP' => 'Departamento de Ventas Internacionales',
-                                'PRES'    => 'Departamento de Presidencia',
-                                'TRAF'    => 'Departamento de Tráfico',
-                                'COMINT'  => 'Departamento de Compras Internacionales',
-                            ])
-                            ->required()
+                            ->relationship('departamento', 'nombre')
+                            ->getOptionLabelFromRecordUsing(fn($record) => "[{$record->codigo}] {$record->nombre}")
                             ->searchable()
+                            ->preload()
+                            ->required()
                             ->live()
                             ->afterStateUpdated(function ($state, callable $set, $record) {
                                 if (blank($record) && filled($state)) {
-                                    $conteoActual = Colaborador::where('department', $state)->count();
-                                    $siguienteNumero = $conteoActual + 1;
-                                    $set('id_colaborador', "{$state}{$siguienteNumero}");
+                                    $depto = Departamento::find($state);
+                                    if ($depto) {
+                                        $conteo = Colaborador::where('departamento_id', $state)->count();
+                                        $siguiente = $conteo + 1;
+                                        $set('id_colaborador', "{$depto->codigo}{$siguiente}");
+                                    }
                                 }
                             }),
 
+                        // Select de Puesto dinámico
+                        Select::make('puesto_id')
+                            ->label('Puesto / Rango')
+                            ->relationship('puesto', 'nombre')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
                         // 2. CAMPO ID / CLAVE COLABORADOR (AUTO-GENERADO)
                         TextInput::make('id_colaborador')
                             ->label('ID / Clave Colaborador')
@@ -97,7 +93,7 @@ class ColaboradorForm
                             ->required()
                             ->placeholder('Ej. Juan Carlos')
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($get, $set) => self::calcularCorreo($get, $set)),
+                            ->afterStateUpdated(fn($get, $set) => self::calcularCorreo($get, $set)),
 
                         // 4. APELLIDOS - REACTIVO PARA EL CORREO
                         TextInput::make('lastname')
@@ -105,7 +101,7 @@ class ColaboradorForm
                             ->required()
                             ->placeholder('Ej. Pérez López')
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($get, $set) => self::calcularCorreo($get, $set)),
+                            ->afterStateUpdated(fn($get, $set) => self::calcularCorreo($get, $set)),
 
                         // 5. CORREO CORPORATIVO (AUTO-GENERADO Y EDITABLE SI SE REQUIERE)
                         TextInput::make('email')
@@ -115,29 +111,7 @@ class ColaboradorForm
                             ->unique(ignoreRecord: true)
                             ->placeholder('se_generara_automaticamente@niterragroup.com'),
 
-                        // 6. SELECT DE RANGO / PUESTO
-                        Select::make('puesto')
-                            ->label('Rango / Puesto')
-                            ->options([
-                                'GENERAL MANAGER'        => 'GENERAL MANAGER',
-                                'DEPUTY GENERAL MANAGER' => 'DEPUTY GENERAL MANAGER',
-                                'MANAGER'                => 'MANAGER',
-                                'DEPUTY MANAGER'         => 'DEPUTY MANAGER',
-                                'SENIOR SUPERVISOR'      => 'SENIOR SUPERVISOR',
-                                'SUPERVISOR A'           => 'SUPERVISOR A',
-                                'SUPERVISOR B'           => 'SUPERVISOR B',
-                                'SUPERVISOR'             => 'SUPERVISOR',
-                                'SENIOR STAFF A'         => 'SENIOR STAFF A',
-                                'SENIOR STAFF B'         => 'SENIOR STAFF B',
-                                'SENIOR STAFF'           => 'SENIOR STAFF',
-                                'STAFF A'                => 'STAFF A',
-                                'STAFF B'                => 'STAFF B',
-                                'STAFF C'                => 'STAFF C',
-                                'STAFF'                  => 'STAFF',
-                            ])
-                            ->required()
-                            ->searchable()
-                            ->placeholder('Selecciona el rango...'),
+
                     ])
                     ->columns(2)
                     ->columnSpanFull(),

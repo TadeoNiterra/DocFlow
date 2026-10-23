@@ -13,8 +13,18 @@ return new class extends Migration {
             $table->string('id_colaborador')->unique(); // Clave principal única
             $table->string('name');
             $table->string('lastname');
-            $table->string('department');
-            $table->string('puesto');
+
+            $table->foreignId('departamento_id')
+                ->nullable()
+                ->constrained('departamentos')
+                ->nullOnDelete();
+                
+
+            $table->foreignId('puesto_id')
+                ->nullable()
+                ->constrained('puestos')
+                ->nullOnDelete();
+                
             $table->string('email')->unique();
 
             // Declaramos como nullable y sin ->unique() estricto

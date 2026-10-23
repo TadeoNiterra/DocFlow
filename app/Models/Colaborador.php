@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Colaborador extends Model
@@ -16,8 +17,8 @@ class Colaborador extends Model
         'id_colaborador',
         'name',
         'lastname',
-        'department',
-        'puesto',
+        'departamento_id',
+        'puesto_id',
         'email',
         'id_sap',
         'id_vpn',
@@ -30,5 +31,15 @@ class Colaborador extends Model
     public function dispositivos(): HasMany
     {
         return $this->hasMany(Dispositivo::class, 'colaborador_id');
+    }
+
+    public function departamento(): BelongsTo
+    {
+        return $this->belongsTo(Departamento::class, 'departamento_id');
+    }
+
+    public function puesto(): BelongsTo
+    {
+        return $this->belongsTo(Puesto::class, 'puesto_id');
     }
 }

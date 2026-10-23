@@ -3,9 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\Colaborador;
+use App\Models\Departamento;
+use App\Models\Puesto;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 
 class ColaboradorSeeder extends Seeder
 {
@@ -34,6 +36,15 @@ class ColaboradorSeeder extends Seeder
 
     public function run(): void
     {
+        // 1. Limpieza inicial segura para SQL Server
+        Schema::disableForeignKeyConstraints();
+        Colaborador::query()->delete();
+        Schema::enableForeignKeyConstraints();
+
+        // 2. Mapas en memoria para relacionar llaves foráneas instantáneamente
+        $mapaDeptosModelos = Departamento::all()->keyBy('codigo');
+        $mapaPuestosModelos = Puesto::all()->keyBy('nombre');
+
         $mapeoDepartamentos = [
             'SCM' => 'SCM',
             'ALMACEN' => 'ALM',
@@ -53,7 +64,7 @@ class ColaboradorSeeder extends Seeder
             'TRAFIC' => 'TRAF',
         ];
 
-        // Lista completa de los 80 colaboradores asignando únicamente los rangos permitidos
+        // 3. Lista completa de 80 colaboradores
         $rawColaboradores = [
             [14, "VELAZQUEZ RODRIGUEZ ALEJANDRA", "SCM", "MANAGER"],
             [16, "AZPEITIA GARCIA MARCO ANTONIO", "ALMACEN", "STAFF"],
@@ -144,10 +155,15 @@ class ColaboradorSeeder extends Seeder
             $numInterno = $data[0];
             $nombreCompleto = $data[1];
             $deptoOriginal = $data[2];
-            $rangoPuesto = $data[3]; // Guarda de forma estricta la clave de la lista
+            $rangoPuesto = $data[3];
 
             $deptKey = $mapeoDepartamentos[$deptoOriginal] ?? 'ADM';
 
+            // Resolución de Llaves Foráneas
+            $departamentoId = $mapaDeptosModelos->get($deptKey)?->id;
+            $puestoId = $mapaPuestosModelos->get($rangoPuesto)?->id;
+
+            // Consecutivo por departamento para el identificador único
             if (!isset($consecutivosDeptos[$deptKey])) {
                 $consecutivosDeptos[$deptKey] = 1;
             } else {
@@ -155,28 +171,26 @@ class ColaboradorSeeder extends Seeder
             }
             $idColaborador = $deptKey . $consecutivosDeptos[$deptKey];
 
+            // Formateo de nombres y apellidos
             $partes = explode(' ', $nombreCompleto);
             $totalPalabras = count($partes);
 
             if ($totalPalabras >= 4) {
                 $pNombre = $this->limpiarTexto($partes[2]);
-                $sNombre = $this->limpiarTexto($partes[3]);
-                $pApellido = $this->limpiarTexto($partes[0]);
                 $sApellido = $this->limpiarTexto($partes[1]);
+                $pApellido = $this->limpiarTexto($partes[0]);
                 $nombreStr = mb_convert_case("{$partes[2]} {$partes[3]}", MB_CASE_TITLE, "UTF-8");
                 $apellidoStr = mb_convert_case("{$partes[0]} {$partes[1]}", MB_CASE_TITLE, "UTF-8");
             } elseif ($totalPalabras == 3) {
                 $pNombre = $this->limpiarTexto($partes[2]);
-                $sNombre = '';
-                $pApellido = $this->limpiarTexto($partes[0]);
                 $sApellido = $this->limpiarTexto($partes[1]);
+                $pApellido = $this->limpiarTexto($partes[0]);
                 $nombreStr = mb_convert_case($partes[2], MB_CASE_TITLE, "UTF-8");
                 $apellidoStr = mb_convert_case("{$partes[0]} {$partes[1]}", MB_CASE_TITLE, "UTF-8");
             } else {
                 $pNombre = $this->limpiarTexto($partes[1] ?? $partes[0]);
-                $sNombre = '';
-                $pApellido = $this->limpiarTexto($partes[0]);
                 $sApellido = '';
+                $pApellido = $this->limpiarTexto($partes[0]);
                 $nombreStr = mb_convert_case($partes[1] ?? $partes[0], MB_CASE_TITLE, "UTF-8");
                 $apellidoStr = mb_convert_case($partes[0], MB_CASE_TITLE, "UTF-8");
             }
@@ -184,6 +198,7 @@ class ColaboradorSeeder extends Seeder
             $email = "{$pNombre}.{$pApellido}@niterragroup.com";
             $idVpn = $email;
 
+            // Generación de usuario para Active Directory
             $letraNombre = substr($pNombre, 0, 1);
             $baseAD = "{$letraNombre}_{$pApellido}";
 
@@ -193,14 +208,15 @@ class ColaboradorSeeder extends Seeder
             }
             $adGeneratedList[] = $baseAD;
 
+            // Inserción enlazada por Llaves Foráneas
             Colaborador::updateOrCreate(
-                ['email' => $email], // Evalúa si ya existe el correo
+                ['email' => $email],
                 [
                     'id_colaborador' => $idColaborador,
                     'name' => $nombreStr,
                     'lastname' => $apellidoStr,
-                    'department' => $deptKey,
-                    'puesto' => $rangoPuesto,
+                    'departamento_id' => $departamentoId,
+                    'puesto_id' => $puestoId,
                     'id_sap' => "SAP_" . strtoupper($baseAD),
                     'id_vpn' => $idVpn,
                     'id_cofidi' => "COF_" . strtoupper($baseAD),
