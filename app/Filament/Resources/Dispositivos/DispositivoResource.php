@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Dispositivos;
 
+use App\Filament\Resources\DispositivoResource\RelationManagers\ChecklistsRelationManager;
 use App\Filament\Resources\Dispositivos\Pages\CreateDispositivo;
 use App\Filament\Resources\Dispositivos\Pages\EditDispositivo;
 use App\Filament\Resources\Dispositivos\Pages\ListDispositivos;
@@ -42,7 +43,7 @@ class DispositivoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ChecklistsRelationManager::class,
         ];
     }
 

@@ -45,15 +45,20 @@ class DispositivosTable
                     ->placeholder('N/A'),
 
                 TextColumn::make('colaborador.name')
-                    ->label('Asignado A')
+                    ->label('Colaborador Asignado')
                     ->formatStateUsing(
                         fn($record) => $record->colaborador
                             ? "{$record->colaborador->name} {$record->colaborador->lastname}"
-                            : 'Sin Asignar (Stock)'
+                            : 'EN STOCK'
                     )
-                    ->badge()
-                    ->color(fn($record) => $record->colaborador ? 'success' : 'gray')
-                    ->searchable(['colaborador.name', 'colaborador.lastname', 'colaborador.id_colaborador']),
+                    ->searchable(query: function ($query, string $search) {
+                        $query->whereHas('colaborador', function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%")
+                                ->orWhere('lastname', 'like', "%{$search}%")
+                                ->orWhere('id_colaborador', 'like', "%{$search}%");
+                        });
+                    })
+                    ->sortable(),
 
                 TextColumn::make('estatus_asignacion')
                     ->label('Estatus')

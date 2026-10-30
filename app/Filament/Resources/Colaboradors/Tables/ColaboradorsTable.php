@@ -33,7 +33,7 @@ class ColaboradorsTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('department')
+                TextColumn::make('departamento.codigo')
                     ->label('Departamento')
                     ->badge()
                     ->color('info')

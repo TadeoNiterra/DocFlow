@@ -95,20 +95,19 @@ class FormatoIt04Form
                             ->image()
                             ->imageEditor()
                             ->reorderable()
-                            ->disk('local') // 👈 Apunta a storage/app/private
+                            ->disk('local')
                             ->directory(fn($get) => 'f-it-04/' . ($get('folio') ?? 'temp'))
                             ->getUploadedFileNameForStorageUsing(
                                 function (TemporaryUploadedFile $file, $get): string {
                                     $folio = $get('folio') ?? 'FIT04-TEMP';
-
                                     static $counter = 1;
                                     $extension = $file->getClientOriginalExtension();
                                     $filename = "{$folio}-{$counter}.{$extension}";
                                     $counter++;
-
                                     return $filename;
                                 }
                             )
+                            ->dehydrated() // Asegura que el estado se conserve para afterCreate() y afterSave()
                             ->columnSpanFull(),
                     ]),
 
@@ -119,9 +118,9 @@ class FormatoIt04Form
                             ->relationship('Creador', 'name')
                             ->default(fn() => Auth::id())
                             ->required()
-                            ->dehydrated() 
-                            ->disabled(),  
-                            
+                            ->dehydrated()
+                            ->disabled(),
+
                         TextInput::make('nombre_gerente')
                             ->label('Firma de Gerente')
                             ->placeholder('Ej. Jesús Marrón')

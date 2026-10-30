@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Dispositivo extends Model
 {
@@ -28,5 +29,10 @@ class Dispositivo extends Model
     public function colaborador(): BelongsTo
     {
         return $this->belongsTo(Colaborador::class, 'colaborador_id');
+    }
+
+    public function checklists(): HasMany
+    {
+        return $this->hasMany(ChecklistEquipo::class, 'dispositivo_id');
     }
 }
