@@ -25,7 +25,9 @@ class ChecklistEquipoForm
             'NA' => 'NA (No Aplica)',
         ];
 
-        return $schema->components([
+        return $schema
+        ->columns(1)
+        ->components([
             Section::make('Datos del Evento y Trazabilidad')
                 ->schema([
                     TextInput::make('folio')

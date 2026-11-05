@@ -13,15 +13,15 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class ChecklistEquipoResource extends Resource
 {
     protected static ?string $model = ChecklistEquipo::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    protected static ?string $recordTitleAttribute = 'ChecklistEquipo';
-
+    protected static UnitEnum|string|null $navigationGroup = 'Formatos SGSI';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentText;
+    protected static ?string $navigationLabel = 'F-IT-03 Checklist de Equipos';
     public static function form(Schema $schema): Schema
     {
         return ChecklistEquipoForm::configure($schema);

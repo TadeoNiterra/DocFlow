@@ -56,11 +56,6 @@ class ChecklistEquiposTable
                     ->sortable()
                     ->placeholder('S/N'),
 
-                TextColumn::make('dispositivo.modeloEquipo.modelo')
-                    ->label('Modelo')
-                    ->searchable()
-                    ->toggleable(),
-
                 TextColumn::make('nombre_usuario')
                     ->label('Usuario Asignado')
                     ->searchable()
@@ -98,7 +93,6 @@ class ChecklistEquiposTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

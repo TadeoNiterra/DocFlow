@@ -32,6 +32,14 @@
       0 => 'CodeZero\\BrowserLocale\\Laravel\\BrowserLocaleServiceProvider',
     ),
   ),
+  'directorytree/ldaprecord-laravel' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'LdapRecord\\Laravel\\LdapServiceProvider',
+      1 => 'LdapRecord\\Laravel\\LdapAuthServiceProvider',
+    ),
+  ),
   'filament/actions' => 
   array (
     'providers' => 
