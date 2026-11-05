@@ -13,6 +13,45 @@ Route::redirect('/', '/dashboard');
 // 🔒 GRUPO DE RUTAS AUTENTICADAS
 Route::middleware(['web', 'auth'])->group(function () {
 
+    // 📄 VISOR SEGURO DE DOCUMENTOS EN RESGUARDO PRIVADO (storage/app/private)
+    Route::get('/documentos/{version}/view-pdf', function (DocumentVersion $version, Request $request) {
+        if (!$version->file_path) {
+            abort(404, 'Ruta de archivo no registrada en el sistema.');
+        }
+
+        // El disco 'local' apunta a storage/app/private en Laravel 11/12/13
+        $disk = Storage::disk('local');
+
+        if (!$disk->exists($version->file_path)) {
+            abort(404, "El archivo en resguardo privado no existe: {$version->file_path}");
+        }
+
+        $absolutePath = $disk->path($version->file_path);
+        $ext = strtolower(pathinfo($version->file_path, PATHINFO_EXTENSION));
+        $fileName = $version->file_name ?? basename($version->file_path);
+
+        // 1. Respuesta en crudo (para stream binario o llamadas iframe internas)
+        if ($request->has('raw')) {
+            return $disk->response($version->file_path);
+        }
+
+        // 2. Visualización directa de PDF en el navegador
+        if ($ext === 'pdf') {
+            return response()->file($absolutePath, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, private',
+            ]);
+        }
+
+        // 3. Vista intermedia para documentos Office (Word / Excel)
+        return view('documentos.visor', [
+            'fileUrl' => route('documentos.ver-pdf', ['version' => $version->id, 'raw' => 1]),
+            'extension' => $ext,
+            'fileName' => $fileName,
+        ]);
+    })->name('documentos.ver-pdf')->middleware(['auth']);
+    
     // 📄 VISOR DE DOCUMENTOS Y OFICINA (DOCX, XLSX, PDF)
     Route::get('/documentos/{version}/view-pdf', function (DocumentVersion $version, Request $request) {
         if (!$version->file_path) {
