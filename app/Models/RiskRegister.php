@@ -24,6 +24,7 @@ class RiskRegister extends Model
         'impact_description',
         'prob',
         'impact',
+        'priority',    // <-- Agregar
         'categoria_control',
         'mitigation_description',
         'mitigation_description_2',
@@ -32,6 +33,7 @@ class RiskRegister extends Model
         'treatment_plan',
         'prob_2',
         'impact_2',
+        'priority_2',  // <-- Agregar
         'current_risk_rating',
         'comentarios_residuales',
         'date_last_reviewed',

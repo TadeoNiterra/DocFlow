@@ -26,6 +26,11 @@ class DatabaseSeeder extends Seeder
             DispositivoSeeder::class,
             ColaboradorSeeder::class,
             ModeloEquipoSeeder::class,
+            FormatoIt04Seeder::class,
+            FormatoIt09Seeder::class,
+            FormatoIt11Seeder::class,
+            FormatoIt18Seeder::class,
+            FormatoIt22Seeder::class,
         ]);
     }
 }
