@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             FormatoIt11Seeder::class,
             FormatoIt18Seeder::class,
             FormatoIt22Seeder::class,
+            FormatoIt13EvidenciaSeeder::class,
         ]);
     }
 }

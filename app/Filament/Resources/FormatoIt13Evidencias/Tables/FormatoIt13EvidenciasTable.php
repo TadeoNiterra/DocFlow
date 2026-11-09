@@ -56,20 +56,42 @@ class FormatoIt13EvidenciasTable
                     ->visible(fn(FormatoIt13Evidencia $record) => !empty($record->rutaEvidencia))
                     ->modalHeading('Vista Previa de Evidencia')
                     ->modalContent(function (FormatoIt13Evidencia $record) {
-                        $url = Storage::url($record->rutaEvidencia);
+                        // Normalizar ruta
+                        $relativePath = str_contains($record->rutaEvidencia, 'evidencias-f-it-13/')
+                            ? $record->rutaEvidencia
+                            : 'evidencias-f-it-13/' . $record->rutaEvidencia;
+
+                        // Buscar en local o private/
+                        $disk = Storage::disk('local');
+                        if (!$disk->exists($relativePath) && $disk->exists('private/' . $relativePath)) {
+                            $relativePath = 'private/' . $relativePath;
+                        }
+
+                        if (!$disk->exists($relativePath)) {
+                            return new HtmlString("
+                <div class='p-4 text-center text-red-500 font-semibold'>
+                    Archivo físico no encontrado en el servidor: {$record->rutaEvidencia}
+                </div>
+            ");
+                        }
+
+                        $contenido = $disk->get($relativePath);
+                        $mime = $disk->mimeType($relativePath) ?? 'image/png';
+                        $base64 = base64_encode($contenido);
+                        $src = "data:{$mime};base64,{$base64}";
                         $ext = strtolower(pathinfo($record->rutaEvidencia, PATHINFO_EXTENSION));
 
                         if ($ext === 'pdf') {
                             return new HtmlString("
-                                <iframe src='{$url}' style='width: 100%; height: 500px; border: none;'></iframe>
-                            ");
+                <iframe src='{$src}' style='width: 100%; height: 500px; border: none;'></iframe>
+            ");
                         }
 
                         return new HtmlString("
-                            <div style='text-align: center;'>
-                                <img src='{$url}' style='max-width: 100%; max-height: 500px; margin: auto; border-radius: 8px;'>
-                            </div>
-                        ");
+            <div style='text-align: center;'>
+                <img src='{$src}' style='max-width: 100%; max-height: 500px; margin: auto; border-radius: 8px;'>
+            </div>
+        ");
                     })
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Cerrar'),
