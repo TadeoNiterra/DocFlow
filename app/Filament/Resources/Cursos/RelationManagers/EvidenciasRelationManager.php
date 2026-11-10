@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Cursos\CursoResource\RelationManagers;
+namespace App\Filament\Resources\Cursos\RelationManagers;
 
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -110,7 +110,7 @@ class EvidenciasRelationManager extends RelationManager
                 TextColumn::make('archivo_path')
                     ->label('Archivo')
                     ->formatStateUsing(fn() => 'Descargar / Ver')
-                    ->url(fn($record) => asset('storage/' . $record->archivo_path))
+                    ->url(fn($record) => route('cursos.evidencia.descargar', $record))
                     ->openUrlInNewTab()
                     ->badge()
                     ->color('primary')

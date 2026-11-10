@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ResponsivaController;
+use Illuminate\Support\Facades\DB;
 
 // Redirección raíz
 Route::redirect('/', '/dashboard');
@@ -51,7 +52,7 @@ Route::middleware(['web', 'auth'])->group(function () {
             'fileName' => $fileName,
         ]);
     })->name('documentos.ver-pdf')->middleware(['auth']);
-    
+
     // 📄 VISOR DE DOCUMENTOS Y OFICINA (DOCX, XLSX, PDF)
     Route::get('/documentos/{version}/view-pdf', function (DocumentVersion $version, Request $request) {
         if (!$version->file_path) {
@@ -113,3 +114,30 @@ Route::middleware(['web', 'auth'])->group(function () {
 Route::get('/colaboradores/{colaborador}/responsiva', [ResponsivaController::class, 'stream'])
     ->name('colaboradores.responsiva.pdf')
     ->middleware(['web', 'auth']);
+
+// 🎓 DESCARGA / VISOR DE EVIDENCIAS DE CURSOS
+Route::get('/cursos-evidencias/{id}', function ($id) {
+    // Busca en las posibles tablas de evidencia de cursos
+    $evidencia = DB::table('curso_evidencias')->where('id', $id)->first()
+        ?? DB::table('evidencias')->where('id', $id)->first()
+        ?? DB::table('cursos_evidencias')->where('id', $id)->first();
+
+    if (!$evidencia || empty($evidencia->archivo_path)) {
+        abort(404, 'Registro de evidencia o ruta de archivo no encontrado.');
+    }
+
+    $disk = Storage::disk('public');
+
+    if (!$disk->exists($evidencia->archivo_path)) {
+        abort(404, 'El archivo físico no se encuentra en storage/app/public.');
+    }
+
+    $pathFisico = $disk->path($evidencia->archivo_path);
+    $mimeType = $disk->mimeType($evidencia->archivo_path) ?? 'application/octet-stream';
+
+    // file() envía el archivo directamente al navegador sin pasar por el compilador de vistas
+    return response()->file($pathFisico, [
+        'Content-Type' => $mimeType,
+        'Content-Disposition' => 'inline; filename="' . basename($evidencia->archivo_path) . '"',
+    ]);
+})->name('cursos.evidencia.descargar');

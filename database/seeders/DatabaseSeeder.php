@@ -32,6 +32,8 @@ class DatabaseSeeder extends Seeder
             FormatoIt18Seeder::class,
             FormatoIt22Seeder::class,
             FormatoIt13EvidenciaSeeder::class,
+            ChecklistEquipoSeeder::class,   
+            AgregarThinkpadsFaltantesSeeder::class,
         ]);
     }
 }
