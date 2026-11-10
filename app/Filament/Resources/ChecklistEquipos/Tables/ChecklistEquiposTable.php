@@ -51,10 +51,19 @@ class ChecklistEquiposTable
                     ->sortable(),
 
                 TextColumn::make('dispositivo.numero_serie')
-                    ->label('N° Serie Equipo')
-                    ->searchable()
-                    ->sortable()
-                    ->placeholder('S/N'),
+                    ->label('Serie / IMEI')
+                    ->getStateUsing(function ($record) {
+                        $disp = $record->dispositivo;
+                        if (!$disp) {
+                            return 'S/N';
+                        }
+
+                        return (!empty($disp->numero_serie) && strtoupper(trim($disp->numero_serie)) !== 'N/A')
+                            ? $disp->numero_serie
+                            : ($disp->imei ?? $disp->imei1 ?? 'S/N');
+                    })
+                    ->searchable(['numero_serie', 'imei'])
+                    ->sortable(),
 
                 TextColumn::make('nombre_usuario')
                     ->label('Usuario Asignado')

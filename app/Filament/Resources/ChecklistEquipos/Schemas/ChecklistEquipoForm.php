@@ -55,7 +55,7 @@ class ChecklistEquipoForm
                             }),
 
                         Select::make('dispositivo_id')
-                            ->label('Equipo / Serie')
+                            ->label('Equipo / Serie o IMEI')
                             ->relationship(
                                 name: 'dispositivo',
                                 titleAttribute: 'numero_serie',
@@ -73,18 +73,15 @@ class ChecklistEquipoForm
                                     $query->whereNotNull('colaborador_id')
                                         ->where('estatus_asignacion', '!=', 'EN STOCK');
 
-                                    // 🔄 MANTENIMIENTO:
-                                    // 1) EXCLUIR todo lo que no sea laptop (celulares, tablets, desktops, monitores)
-                                    // 2) Orden cíclico: los que tienen más tiempo sin mantenimiento van primero
+                                    // 🔄 MANTENIMIENTO: Solo laptops con orden rotativo
                                     if ($accion === 'MANTENIMIENTO') {
                                         return $query
                                             ->where(function (EloquentBuilder $q) {
-                                                // Filtra por modelos de laptops (IDs 1 al 5: Thinkpad T14 y T16)
                                                 $q->whereIn('modelo_equipo_id', [1, 2, 3, 4, 5])
                                                     ->orWhereHas('modeloEquipo', function ($mq) {
-                                                    $mq->where('tipo', 'like', '%LAPTOP%')
-                                                        ->orWhere('modelo', 'like', '%THINKPAD%');
-                                                });
+                                                        $mq->where('tipo', 'like', '%LAPTOP%')
+                                                            ->orWhere('modelo', 'like', '%THINKPAD%');
+                                                    });
                                             })
                                             ->select('dispositivos.*')
                                             ->selectSub(
@@ -102,6 +99,11 @@ class ChecklistEquipoForm
                                 }
                             )
                             ->getOptionLabelFromRecordUsing(function (Dispositivo $d) {
+                                // 🔍 Si tiene número de serie y no es 'N/A', se muestra la serie; si no, el IMEI
+                                $identificador = (!empty($d->numero_serie) && strtoupper(trim($d->numero_serie)) !== 'N/A')
+                                    ? "S/N: {$d->numero_serie}"
+                                    : "IMEI: " . ($d->imei ?? $d->imei1 ?? 'Sin identificador');
+
                                 $colabNombre = $d->colaborador
                                     ? "{$d->colaborador->name} {$d->colaborador->lastname}"
                                     : 'EN STOCK';
@@ -113,11 +115,12 @@ class ChecklistEquipoForm
 
                                 $infoCiclo = $ultimoMant
                                     ? ' | Últ. Mant: ' . Carbon::parse($ultimoMant)->format('d/m/Y')
-                                    : ' | Sin mant. previo';
+                                    : '';
 
-                                return "{$d->numero_serie} - {$d->modeloEquipo?->marca} {$d->modeloEquipo?->modelo} [{$colabNombre}]{$infoCiclo}";
+                                return "{$identificador} - {$d->modeloEquipo?->marca} {$d->modeloEquipo?->modelo} [{$colabNombre}]{$infoCiclo}";
                             })
-                            ->searchable(['numero_serie'])
+                            // 🔎 Permite buscar en el Select escribiendo la Serie o el IMEI
+                            ->searchable(['numero_serie', 'imei'])
                             ->preload()
                             ->required()
                             ->live()
