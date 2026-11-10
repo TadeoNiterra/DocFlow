@@ -4,12 +4,12 @@ namespace App\Filament\Resources\ChecklistEquipos\Tables;
 
 use App\Models\ChecklistEquipo;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 
 class ChecklistEquiposTable
@@ -79,12 +79,29 @@ class ChecklistEquiposTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('fecha', 'desc')
+            // 📂 Agrupación por tipo de acción
+            // 📂 Agrupación por tipo de acción con capacidad de colapso
+            ->defaultGroup('accion')
+            ->groups([
+                Group::make('accion')
+                    ->label('Tipo de Acción')
+                    ->collapsible() // 👈 Permite abrir y contraer cada grupo haciendo clic en el encabezado
+                    // ->collapsed() // Opcional: descomenta esta línea si deseas que aparezcan contraídos por defecto al cargar la página
+                    ->getTitleFromRecordUsing(fn(ChecklistEquipo $record): string => match ($record->accion) {
+                        'MANTENIMIENTO' => 'Mantenimientos Preventivos / Correctivos',
+                        'ASIGNACION_INICIAL' => 'Asignaciones Iniciales',
+                        'REPARACION' => 'Envíos a Reparación',
+                        'DEVOLUCION' => 'Devoluciones (Bajas)',
+                        'CAMBIO' => 'Cambios (Fin de Arrendamiento)',
+                        default => $record->accion,
+                    }),
+            ])
             ->filters([
                 SelectFilter::make('accion')
                     ->label('Tipo de Acción')
                     ->options([
-                        'ASIGNACION_INICIAL' => 'Asignación Inicial',
                         'MANTENIMIENTO' => 'Mantenimiento',
+                        'ASIGNACION_INICIAL' => 'Asignación Inicial',
                         'REPARACION' => 'Reparación',
                         'DEVOLUCION' => 'Devolución (Baja)',
                         'CAMBIO' => 'Cambio (Arrendamiento)',
