@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\ChecklistEquipos\Tables;
 
 use App\Models\ChecklistEquipo;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -11,6 +13,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class ChecklistEquiposTable
 {
@@ -50,30 +53,28 @@ class ChecklistEquiposTable
                     })
                     ->sortable(),
 
-                TextColumn::make('dispositivo.numero_serie')
+                TextColumn::make('dispositivo_identificador')
                     ->label('Serie / IMEI')
-                    ->getStateUsing(function ($record) {
+                    ->getStateUsing(function (ChecklistEquipo $record) {
                         $disp = $record->dispositivo;
                         if (!$disp) {
                             return 'S/N';
                         }
-
                         return (!empty($disp->numero_serie) && strtoupper(trim($disp->numero_serie)) !== 'N/A')
                             ? $disp->numero_serie
                             : ($disp->imei ?? $disp->imei1 ?? 'S/N');
                     })
-                    ->searchable(['numero_serie', 'imei'])
-                    ->sortable(),
+                    ->searchable(query: function ($query, string $search) {
+                        $query->whereHas('dispositivo', function ($q) use ($search) {
+                            $q->where('numero_serie', 'like', "%{$search}%")
+                                ->orWhere('imei', 'like', "%{$search}%");
+                        });
+                    }),
 
                 TextColumn::make('nombre_usuario')
                     ->label('Usuario Asignado')
                     ->searchable()
                     ->sortable(),
-
-                TextColumn::make('nombre_jefe_directo')
-                    ->label('Jefe Directo')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('nombre_sistemas')
                     ->label('Validado por TI')
@@ -88,17 +89,14 @@ class ChecklistEquiposTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('fecha', 'desc')
-            // 📂 Agrupación por tipo de acción
-            // 📂 Agrupación por tipo de acción con capacidad de colapso
             ->defaultGroup('accion')
             ->groups([
                 Group::make('accion')
                     ->label('Tipo de Acción')
-                    ->collapsible() // 👈 Permite abrir y contraer cada grupo haciendo clic en el encabezado
-                    // ->collapsed() // Opcional: descomenta esta línea si deseas que aparezcan contraídos por defecto al cargar la página
+                    ->collapsible()
                     ->getTitleFromRecordUsing(fn(ChecklistEquipo $record): string => match ($record->accion) {
-                        'MANTENIMIENTO' => 'Mantenimientos Preventivos / Correctivos',
                         'ASIGNACION_INICIAL' => 'Asignaciones Iniciales',
+                        'MANTENIMIENTO' => 'Mantenimientos Preventivos / Correctivos',
                         'REPARACION' => 'Envíos a Reparación',
                         'DEVOLUCION' => 'Devoluciones (Bajas)',
                         'CAMBIO' => 'Cambios (Fin de Arrendamiento)',
@@ -109,8 +107,8 @@ class ChecklistEquiposTable
                 SelectFilter::make('accion')
                     ->label('Tipo de Acción')
                     ->options([
-                        'MANTENIMIENTO' => 'Mantenimiento',
                         'ASIGNACION_INICIAL' => 'Asignación Inicial',
+                        'MANTENIMIENTO' => 'Mantenimiento',
                         'REPARACION' => 'Reparación',
                         'DEVOLUCION' => 'Devolución (Baja)',
                         'CAMBIO' => 'Cambio (Arrendamiento)',
@@ -119,9 +117,23 @@ class ChecklistEquiposTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                Action::make('pdf')
+                    ->label('PDF')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->url(fn(ChecklistEquipo $record): string => route('checklists.pdf.download', $record))
+                    ->openUrlInNewTab(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    BulkAction::make('descargar_pdf_lote')
+                        ->label('Imprimir Seleccionados (PDF)')
+                        ->icon('heroicon-o-printer')
+                        ->color('success')
+                        ->action(function (Collection $records) {
+                            $ids = $records->pluck('id')->join(',');
+                            return redirect()->away(route('checklists.pdf.bulk', ['ids' => $ids]));
+                        }),
                     DeleteBulkAction::make(),
                 ]),
             ]);

@@ -193,13 +193,13 @@
                         <td>Cuenta de correo</td>
                         <td>General</td>
                         <td>{{ $usuario->email }}</td>
-                        <td>{{ $usuario->department }}</td>
+                        <td>{{ $usuario->departamento->nombre ?? 'N/A' }}</td>
                     </tr>
                     <tr>
                         <td>Usuario de red (Active Directory)</td>
                         <td>General</td>
                         <td>{{ $usuario->id_AD ?? 'N/A' }}</td>
-                        <td>{{ $usuario->department }}</td>
+                        <td>{{ $usuario->departamento->nombre ?? 'N/A' }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -219,19 +219,19 @@
                         <td>VPN</td>
                         <td>General</td>
                         <td>{{ $usuario->id_vpn ?? 'N/A' }}</td>
-                        <td>{{ $usuario->department }}</td>
+                        <td>{{ $usuario->departamento->nombre ?? 'N/A' }}</td>
                     </tr>
                     <tr>
                         <td>SAP</td>
                         <td>General</td>
                         <td>{{ $usuario->id_sap ?? 'N/A' }}</td>
-                        <td>{{ $usuario->department }}</td>
+                        <td>{{ $usuario->departamento->nombre ?? 'N/A' }}</td>
                     </tr>
                     <tr>
                         <td>ATEB Cofidi</td>
                         <td>General</td>
                         <td>{{ $usuario->id_cofidi ?? 'N/A' }}</td>
-                        <td>{{ $usuario->department }}</td>
+                        <td>{{ $usuario->departamento->nombre ?? 'N/A' }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -247,7 +247,7 @@
                 <tbody>
                     <tr>
                         <td>Juego de llaves (Site, Cajón de escritorio, Oficina Sistemas)</td>
-                        <td>N/A</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>Tarjeta de proximidad / Acceso</td>
