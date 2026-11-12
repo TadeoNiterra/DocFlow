@@ -16,9 +16,10 @@ class FormatoLog01Seeder extends Seeder
             // 2022 (F-LOG-(T)-01)
             // =================================================================
             [
-                'proveedor' => 'IMO TI',
+                'proveedor_id' => 9, // MAYSOFT GLOBAL, SA DE RL DE CV (IMO TI)
+                'proveedor_nom' => 'MAYSOFT GLOBAL, SA DE RL DE CV',
                 'area' => 'IT',
-                'tipo' => false, // Re-evaluación
+                'tipo' => false,
                 'fecha' => '2022-09-06',
                 'fechaAnterior' => '2021-09-06',
                 'producto' => 'Mantenimiento servidores y VPN',
@@ -46,7 +47,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'RB TECNOLOGIAS Y SISTEMAS DE INFORMACION S.A. DE C.V.',
+                'proveedor_id' => 12, // RB TECNOLOGIAS Y SISTEMAS DE INFORMACION S.A DE C.V.
+                'proveedor_nom' => 'RB TECNOLOGIAS Y SISTEMAS DE INFORMACION S.A DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2022-09-06',
@@ -76,7 +78,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'SCITUM, S.A de C.V',
+                'proveedor_id' => 14, // SCITUM, S.A de C.V
+                'proveedor_nom' => 'SCITUM, S.A de C.V',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2022-09-06',
@@ -106,7 +109,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'Sistemas de Respaldo de Energía S.A de C.V',
+                'proveedor_id' => 13, // SIRE - Sistemas de Respaldo de Energía S.A de C.V
+                'proveedor_nom' => 'Sistemas de Respaldo de Energía S.A de C.V',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2022-09-06',
@@ -136,7 +140,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'Tec Gurus',
+                'proveedor_id' => 7, // I.T QUALITY SERVICES S.A DE C.V. (Tec Gurus)
+                'proveedor_nom' => 'I.T QUALITY SERVICES S.A DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2022-09-06',
@@ -166,7 +171,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'Vegasoft',
+                'proveedor_id' => null, // Vegasoft
+                'proveedor_nom' => 'Vegasoft',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2022-09-06',
@@ -200,11 +206,12 @@ class FormatoLog01Seeder extends Seeder
             // 2023 (F-LOG-(T)-01)
             // =================================================================
             [
-                'proveedor' => 'Guedez Barefield Advisors Mexico',
+                'proveedor_id' => 17, // GB Advisors - Guedez Barefield Advisors México, S.A. de C.V.
+                'proveedor_nom' => 'Guedez Barefield Advisors México, S.A. de C.V.',
                 'area' => 'IT',
-                'tipo' => true, // Evaluación inicial
+                'tipo' => true,
                 'fecha' => '2023-09-06',
-                'fechaAnterior' => '2023-09-06', // Mismo día para evitar NULL en BD
+                'fechaAnterior' => '2023-09-06',
                 'producto' => 'Software',
                 'precio' => 2,
                 'respuesta' => 2,
@@ -230,7 +237,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'IMO TI',
+                'proveedor_id' => 9, // MAYSOFT GLOBAL, SA DE RL DE CV (IMO TI)
+                'proveedor_nom' => 'MAYSOFT GLOBAL, SA DE RL DE CV',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2023-09-06',
@@ -260,7 +268,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'RB TECNOLOGIAS Y SISTEMAS DE INFORMACION S.A. DE C.V.',
+                'proveedor_id' => 12, // RB TECNOLOGIAS
+                'proveedor_nom' => 'RB TECNOLOGIAS Y SISTEMAS DE INFORMACION S.A DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2023-09-06',
@@ -290,7 +299,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'SCITUM, S.A de C.V',
+                'proveedor_id' => 14, // SCITUM
+                'proveedor_nom' => 'SCITUM, S.A de C.V',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2023-09-06',
@@ -320,7 +330,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'Sistemas de Respaldo de Energía S.A de C.V',
+                'proveedor_id' => 13, // SIRE
+                'proveedor_nom' => 'Sistemas de Respaldo de Energía S.A de C.V',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2023-09-06',
@@ -350,7 +361,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'Tec Gurus',
+                'proveedor_id' => 7, // I.T QUALITY SERVICES
+                'proveedor_nom' => 'I.T QUALITY SERVICES S.A DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2023-09-06',
@@ -380,7 +392,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'Vegasoft',
+                'proveedor_id' => null, // Vegasoft
+                'proveedor_nom' => 'Vegasoft',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2023-09-06',
@@ -414,7 +427,8 @@ class FormatoLog01Seeder extends Seeder
             // 2024 (F-LOG-(T)-01 Rev. 04)
             // =================================================================
             [
-                'proveedor' => 'INTERNET MOVIL S. DE R.L. DE C.V.',
+                'proveedor_id' => 9, // MAYSOFT (INTERNET MOVIL)
+                'proveedor_nom' => 'MAYSOFT GLOBAL, SA DE RL DE CV',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -444,7 +458,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'ABBA NETWORKS SAPI DE C.V.',
+                'proveedor_id' => 1, // ABBA NETWORKS
+                'proveedor_nom' => 'ABBA NETWORKS SAPI DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -474,7 +489,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'AT&T Global Network Services Mexico, S. de R.L. de C.V.',
+                'proveedor_id' => 2, // AT&T GLOBAL
+                'proveedor_nom' => 'AT&T GLOBAL NETWORK SERVICES MEXICO S DE CV',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -504,11 +520,12 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'MEXICO RED DE TELECOMUNICACIONES',
+                'proveedor_id' => 4, // BESTEL
+                'proveedor_nom' => 'MEXICO RED DE TELECOMUNICACIONES',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
-                'fechaAnterior' => '2024-09-06', // Sin anterior -> Mismo día para evitar NULL
+                'fechaAnterior' => '2024-09-06',
                 'producto' => 'Internet dedicado',
                 'precio' => 2,
                 'respuesta' => 2,
@@ -534,11 +551,12 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'BITAM de México sa de cv',
+                'proveedor_id' => 15, // BITAM
+                'proveedor_nom' => 'BITAM de mexico sa de cv',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
-                'fechaAnterior' => '2024-09-06', // Mismo día para evitar NULL
+                'fechaAnterior' => '2024-09-06',
                 'producto' => 'BIFISKUR Conciliación con SAT',
                 'precio' => 1,
                 'respuesta' => 2,
@@ -564,7 +582,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'ATEB COFIDI SA DE CV',
+                'proveedor_id' => 3, // ATEB
+                'proveedor_nom' => 'ATEB SERVICIOS, S.A. DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -594,7 +613,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'CSI LEASING MEXICO S. DE R.L. DE C.V.',
+                'proveedor_id' => 5, // CSI LEASING
+                'proveedor_nom' => 'CSI LEASING MEXICO S. DE R.L. DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -624,7 +644,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'Dell Leasing Mexico S de RL de CV',
+                'proveedor_id' => 6, // DELL
+                'proveedor_nom' => 'DELL Leasing Mexico S de RL de CV',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -654,7 +675,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'I.T. QUALITY SERVICES S.A. DE C.V',
+                'proveedor_id' => 7, // I.T QUALITY SERVICES
+                'proveedor_nom' => 'I.T QUALITY SERVICES S.A DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -684,11 +706,12 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'ICORP, S.A de C.V',
+                'proveedor_id' => 16, // ICORP
+                'proveedor_nom' => 'Innovación y Administración de TI S de RL de CV',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
-                'fechaAnterior' => '2024-09-06', // Sin anterior -> Mismo día
+                'fechaAnterior' => '2024-09-06',
                 'producto' => 'SOFTWARE DE SEGURIDAD',
                 'precio' => 1,
                 'respuesta' => 2,
@@ -714,7 +737,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'SCITUM, S.A de C.V',
+                'proveedor_id' => 14, // SCITUM
+                'proveedor_nom' => 'SCITUM, S.A de C.V',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -744,7 +768,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'MAYSOFT GLOBAL, SA DE RL DE CV',
+                'proveedor_id' => 9, // MAYSOFT
+                'proveedor_nom' => 'MAYSOFT GLOBAL, SA DE RL DE CV',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -774,7 +799,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'MOBILE SOLUTIONS  TELECOMUNICACIONES  S.A DE C.V.',
+                'proveedor_id' => 10, // MOBILE SOLUTIONS
+                'proveedor_nom' => 'MOBILE SOLUTIONS TELECOMUNICACIONES S.A. DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -804,7 +830,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'NEUBOX INTERNET  S.A. DE C.V.',
+                'proveedor_id' => 11, // NEUBOX
+                'proveedor_nom' => 'NEUBOX INTERNET S.A DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -834,7 +861,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'RB TECNOLOGIAS Y SISTEMAS DE INFORMACION S.A. DE C.V.',
+                'proveedor_id' => 12, // RB TECNOLOGIAS
+                'proveedor_nom' => 'RB TECNOLOGIAS Y SISTEMAS DE INFORMACION S.A DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2024-09-06',
@@ -868,7 +896,8 @@ class FormatoLog01Seeder extends Seeder
             // 2025 (F-LOG-(T)-01 Rev. 04)
             // =================================================================
             [
-                'proveedor' => 'INTERNET MOVIL S. DE R.L. DE C.V.',
+                'proveedor_id' => 9, // MAYSOFT (INTERNET MOVIL)
+                'proveedor_nom' => 'MAYSOFT GLOBAL, SA DE RL DE CV',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -898,7 +927,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'ABBA NETWORKS SAPI DE C.V.',
+                'proveedor_id' => 1, // ABBA NETWORKS
+                'proveedor_nom' => 'ABBA NETWORKS SAPI DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-05',
@@ -928,7 +958,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'AT&T Global Network Services Mexico, S. de R.L. de C.V.',
+                'proveedor_id' => 2, // AT&T GLOBAL
+                'proveedor_nom' => 'AT&T GLOBAL NETWORK SERVICES MEXICO S DE CV',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -958,7 +989,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'MEXICO RED DE TELECOMUNICACIONES',
+                'proveedor_id' => 4, // BESTEL
+                'proveedor_nom' => 'MEXICO RED DE TELECOMUNICACIONES',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -988,7 +1020,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'BITAM de México sa de cv',
+                'proveedor_id' => 15, // BITAM
+                'proveedor_nom' => 'BITAM de mexico sa de cv',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -1018,7 +1051,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'ATEB COFIDI SA DE CV',
+                'proveedor_id' => 3, // ATEB
+                'proveedor_nom' => 'ATEB SERVICIOS, S.A. DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -1048,7 +1082,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'CSI LEASING MEXICO S. DE R.L. DE C.V.',
+                'proveedor_id' => 5, // CSI LEASING
+                'proveedor_nom' => 'CSI LEASING MEXICO S. DE R.L. DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -1078,7 +1113,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'Dell Leasing Mexico S de RL de CV',
+                'proveedor_id' => 6, // DELL
+                'proveedor_nom' => 'DELL Leasing Mexico S de RL de CV',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -1108,7 +1144,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'I.T. QUALITY SERVICES S.A. DE C.V',
+                'proveedor_id' => 7, // I.T QUALITY SERVICES
+                'proveedor_nom' => 'I.T QUALITY SERVICES S.A DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -1138,7 +1175,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'ICORP, S.A de C.V',
+                'proveedor_id' => 16, // ICORP
+                'proveedor_nom' => 'Innovación y Administración de TI S de RL de CV',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -1168,7 +1206,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'SCITUM, S.A de C.V',
+                'proveedor_id' => 14, // SCITUM
+                'proveedor_nom' => 'SCITUM, S.A de C.V',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -1198,11 +1237,12 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'Lenovo México, S. de R.L. de C.V.',
+                'proveedor_id' => 8, // LENOVO
+                'proveedor_nom' => 'Lenovo México, S. de R.L. de C.V.',
                 'area' => 'IT',
-                'tipo' => true, // Evaluación inicial
+                'tipo' => true,
                 'fecha' => '2025-09-06',
-                'fechaAnterior' => '2025-09-06', // Mismo día para evitar NULL
+                'fechaAnterior' => '2025-09-06',
                 'producto' => 'Arrendamiento de equipo computo',
                 'precio' => 1,
                 'respuesta' => 2,
@@ -1228,7 +1268,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'MAYSOFT GLOBAL, SA DE RL DE CV',
+                'proveedor_id' => 9, // MAYSOFT
+                'proveedor_nom' => 'MAYSOFT GLOBAL, SA DE RL DE CV',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -1258,7 +1299,8 @@ class FormatoLog01Seeder extends Seeder
                 'vigencia' => true,
             ],
             [
-                'proveedor' => 'RB TECNOLOGIAS Y SISTEMAS DE INFORMACION S.A. DE C.V.',
+                'proveedor_id' => 12, // RB TECNOLOGIAS
+                'proveedor_nom' => 'RB TECNOLOGIAS Y SISTEMAS DE INFORMACION S.A DE C.V.',
                 'area' => 'IT',
                 'tipo' => false,
                 'fecha' => '2025-09-06',
@@ -1287,19 +1329,559 @@ class FormatoLog01Seeder extends Seeder
                 'contrato' => true,
                 'vigencia' => true,
             ],
+
+            // =================================================================
+            // 2026 (F-LOG-(T)-01 Rev. 04) - Re-evaluación Anual (07/09/2026)
+            // =================================================================
+            [
+                'proveedor_id' => 1, // ABBA NETWORKS
+                'proveedor_nom' => 'ABBA NETWORKS SAPI DE C.V.',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'SOFTWARE DE SEGURIDAD',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 2, // AT&T GLOBAL
+                'proveedor_nom' => 'AT&T GLOBAL NETWORK SERVICES MEXICO S DE CV',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'VPN',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 3, // ATEB
+                'proveedor_nom' => 'ATEB SERVICIOS, S.A. DE C.V.',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'Facturación electrónica',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 4, // BESTEL
+                'proveedor_nom' => 'MEXICO RED DE TELECOMUNICACIONES',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'Internet dedicado',
+                'precio' => 2,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 5, // CSI LEASING
+                'proveedor_nom' => 'CSI LEASING MEXICO S. DE R.L. DE C.V.',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'Arrendamiento de equipo computo',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 6, // DELL
+                'proveedor_nom' => 'DELL Leasing Mexico S de RL de CV',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'Arrendamiento de equipo computo',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 7, // I.T QUALITY SERVICES
+                'proveedor_nom' => 'I.T QUALITY SERVICES S.A DE C.V.',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'PAGINA WEB',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 8, // LENOVO
+                'proveedor_nom' => 'Lenovo México, S. de R.L. de C.V.',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'Arrendamiento de equipo computo',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 9, // MAYSOFT
+                'proveedor_nom' => 'MAYSOFT GLOBAL, SA DE RL DE CV',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'FIREWALL Y SOPORTE TI',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 10, // MOBILE SOLUTIONS
+                'proveedor_nom' => 'MOBILE SOLUTIONS TELECOMUNICACIONES S.A. DE C.V.',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'Tecnologia de la información (Sofware controlador de Iphone)',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 11, // NEUBOX
+                'proveedor_nom' => 'NEUBOX INTERNET S.A DE C.V.',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'Certificado de seguridad SSL',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 12, // RB TECNOLOGIAS
+                'proveedor_nom' => 'RB TECNOLOGIAS Y SISTEMAS DE INFORMACION S.A DE C.V.',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'MANTENIMIENTO A SISTEMAS DE LA INFORMACIÓN',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 13, // SIRE
+                'proveedor_nom' => 'Sistemas de Respaldo de Energía S.A de C.V',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'Respaldo de Energía / UPS',
+                'precio' => 2,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 14, // SCITUM
+                'proveedor_nom' => 'SCITUM, S.A de C.V',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'SERVICIO DE INTERNET Y CIBERSEGURIDAD',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 15, // BITAM
+                'proveedor_nom' => 'BITAM de mexico sa de cv',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'BIFISKUR Conciliación con SAT',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 16, // ICORP
+                'proveedor_nom' => 'Innovación y Administración de TI S de RL de CV',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'SOFTWARE DE SEGURIDAD',
+                'precio' => 1,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
+            [
+                'proveedor_id' => 17, // GB Advisors
+                'proveedor_nom' => 'Guedez Barefield Advisors México, S.A. de C.V.',
+                'area' => 'IT',
+                'tipo' => false,
+                'fecha' => '2026-09-07',
+                'fechaAnterior' => '2025-09-06',
+                'producto' => 'Software / Mesa de Ayuda',
+                'precio' => 2,
+                'respuesta' => 2,
+                'experiencia' => 2,
+                'pago' => 2,
+                'pregunta1' => 2,
+                'pregunta2' => 2,
+                'pregunta3' => 2,
+                'pregunta4' => 2,
+                'pregunta5' => 2,
+                'pregunta6' => 2,
+                'pregunta7' => 2,
+                'pregunta8' => 2,
+                'pregunta9' => 2,
+                'pregunta10' => 2,
+                'pregunta11' => 2,
+                'pregunta12' => 2,
+                'pregunta13' => 2,
+                'pregunta14' => 2,
+                'pregunta15' => 2,
+                'evaluador' => 'José Martín Tadeo Catalán',
+                'contrato' => true,
+                'vigencia' => true,
+            ],
         ];
 
         foreach ($evaluaciones as $item) {
-            $proveedorId = null;
+            $proveedorId = $item['proveedor_id'];
 
-            if (class_exists(Proveedor::class) && Schema::hasTable('proveedores')) {
-                $proveedor = Proveedor::firstOrCreate(
-                    ['nombre' => $item['proveedor']],
-                    [
-                        'contacto' => 'Contacto ' . $item['proveedor'],
+            // Fallback únicamente para registros históricos sin ID fijo en catálogo 1-17 (ej. Vegasoft)
+            if (!$proveedorId && class_exists(Proveedor::class) && Schema::hasTable('proveedores')) {
+                $nombreLimpio = trim($item['proveedor_nom']);
+
+                $proveedor = Proveedor::where('nombre', 'LIKE', "%{$nombreLimpio}%")
+                    ->orWhere('razon_social', 'LIKE', "%{$nombreLimpio}%")
+                    ->first();
+
+                if (!$proveedor) {
+                    $proveedor = Proveedor::create([
+                        'nombre' => $nombreLimpio,
+                        'razon_social' => $nombreLimpio,
+                        'contacto' => 'Contacto ' . $nombreLimpio,
                         'telefono' => '5500000000',
-                    ]
-                );
+                    ]);
+                }
+
                 $proveedorId = $proveedor->id;
             }
 
@@ -1342,6 +1924,6 @@ class FormatoLog01Seeder extends Seeder
             );
         }
 
-        $this->command->info('¡Las ' . count($evaluaciones) . ' evaluaciones F-LOG-(T)-01 han sido sembradas exitosamente!');
+        $this->command->info('¡Evaluaciones F-LOG-(T)-01 sembradas (incluyendo las 17 de 2026)!');
     }
 }
