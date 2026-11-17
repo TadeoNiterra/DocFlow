@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             FormatoIt13EvidenciaSeeder::class,
             ChecklistEquipoSeeder::class,   
             AgregarThinkpadsFaltantesSeeder::class,
+            RecertificacionHistoricoSeeder::class,
         ]);
     }
 }
