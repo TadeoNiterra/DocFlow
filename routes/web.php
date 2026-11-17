@@ -120,4 +120,37 @@ Route::middleware(['web', 'auth'])->group(function () {
         ]);
     })->name('cursos.evidencia.descargar');
 
+    // =========================================================================
+    // 📋 VISOR / DESCARGA DE EVIDENCIAS DE AUDITORÍAS
+    // =========================================================================
+    $resolverEvidenciaAuditoria = function (string $filename) {
+        $safeName = basename($filename);
+
+        $posiblesRutas = [
+            public_path('storage/uploads/auditorias/evidencias/' . $safeName),
+            public_path('storage/auditorias/evidencias/' . $safeName),
+            storage_path('app/public/uploads/auditorias/evidencias/' . $safeName),
+            storage_path('app/public/auditorias/evidencias/' . $safeName),
+            storage_path('app/private/uploads/auditorias/evidencias/' . $safeName),
+            storage_path('app/private/auditorias/evidencias/' . $safeName),
+        ];
+
+        foreach ($posiblesRutas as $ruta) {
+            if (file_exists($ruta)) {
+                return response()->file($ruta, [
+                    'Content-Type' => mime_content_type($ruta) ?: 'application/octet-stream',
+                    'Content-Disposition' => 'inline; filename="' . $safeName . '"',
+                ]);
+            }
+        }
+
+        abort(404, 'El archivo de evidencia de auditoría no existe.');
+    };
+
+    Route::get('/auditorias/evidencias/{filename}', $resolverEvidenciaAuditoria)
+        ->name('auditorias.evidencia.ver');
+
+    // Intercepta enlaces previos generados sin "/uploads/"
+    Route::get('/storage/auditorias/evidencias/{filename}', $resolverEvidenciaAuditoria);
+
 });
