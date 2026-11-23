@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\DispositivoResource\RelationManagers;
+namespace App\Filament\Resources\Dispositivos\RelationManagers;
 
 use Filament\Actions\CreateAction;
 use Filament\Actions\ViewAction;

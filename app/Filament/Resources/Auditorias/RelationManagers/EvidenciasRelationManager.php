@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Auditorias\AuditoriaResource\RelationManagers;
+namespace App\Filament\Resources\Auditorias\RelationManagers;
 
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
